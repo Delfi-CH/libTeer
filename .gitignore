@@ -1,0 +1,10 @@
+*.tar
+*.tar.*
+bzip2-*
+xz-*
+zlib-*
+zstd-*
+build
+*.so
+*.a
+*.o
