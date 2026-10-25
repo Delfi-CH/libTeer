@@ -3,6 +3,6 @@
 
 int main() {
     printf("hello, tar\n");
-    pack();
+    libtar_create();
     return 0;
 }

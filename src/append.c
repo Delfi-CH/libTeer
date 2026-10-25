@@ -1,5 +1,5 @@
 #include "../include/libtar/tar.h"
 
-void append() {
+void libtar_append() {
     return;
 }

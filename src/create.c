@@ -1,5 +1,5 @@
 #include "../include/libtar/tar.h"
 
-void pack() {
+void libtar_create() {
     return;
 }

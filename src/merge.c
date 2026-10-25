@@ -1,5 +1,5 @@
 #include "../include/libtar/tar.h"
 
-void merge() {
+void libtar_merge() {
     return;
 }

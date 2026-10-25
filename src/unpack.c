@@ -1,5 +1,5 @@
 #include "../include/libtar/tar.h"
 
-void unpack() {
+void libtar_unpack() {
     return;
 }
