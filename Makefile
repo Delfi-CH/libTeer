@@ -49,7 +49,7 @@ CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/pack.o $(BUILDDI
 
 COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/compress/xz.c $(SRCDIR)/compress/zstd.c
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
-COMPRESS_EXTERNAL_OBJ = $(BZIP2_OBJ) $(ZLIB_OBJ) $(LZMA_OBJ) $(ZSTD_OBJ)
+COMPRESS_EXTERNAL_OBJ = $(THIRDPARTY_DIR)/libbz2.a $(THIRDPARTY_DIR)/libz.a $(THIRDPARTY_DIR)/liblzma.a $(THIRDPARTY_DIR)/libzstd.a
 
 ifeq ($(FEATURE_COMPRESSION), true)
 	OBJ = $(CORE_OBJ) $(COMPRESS_OBJ)
@@ -91,12 +91,15 @@ all: $(BUILDDIR) $(PRODUCT)
 $(BUILDDIR):
 	mkdir --parents $(BUILDDIR)
 
+$(THIRDPARTY_DIR):
+	mkdir --parents $(THIRDPARTY_DIR)
+
 ifeq ($(OUTPUT), shared)
 $(PRODUCT): $(OBJ)
 	$(CC) -shared $(OBJ) -o $(PRODUCT)
 else 
 ifeq ($(FEATURE_COMPRESSION), true)
-$(PRODUCT): $(OBJ)
+$(PRODUCT): $(THIRDPARTY_DIR) $(OBJ) $(COMPRESS_EXTERNAL_OBJ)
 	$(AR) rcs $(PRODUCT) $(OBJ)
 else
 $(PRODUCT): $(OBJ)
@@ -115,6 +118,12 @@ $(CORE_OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 
 $(COMPRESS_OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/compress/%.c $(HEADERS)
 	$(CC) -c $(CFLAGS) $< -o $@
+
+$(COMPRESS_EXTERNAL_OBJ): build-libraries
+	cp $(BZIP2_OBJ) $(THIRDPARTY_DIR)/
+	cp $(ZLIB_OBJ) $(THIRDPARTY_DIR)/
+	cp $(LZMA_OBJ) $(THIRDPARTY_DIR)/
+	cp $(ZSTD_OBJ) $(THIRDPARTY_DIR)/
 
 .PHONY: build-libraries
 
@@ -163,4 +172,4 @@ $(ZSTD_ARCHIVE):
 .PHONY: clean
 
 clean:
-	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC)
+	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR)
