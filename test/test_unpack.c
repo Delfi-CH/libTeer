@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 int main() {
-    printf("hello, tar\n");
-    libtar_create();
+    libtar_unpack("foo.tar");
     return 0;
 }

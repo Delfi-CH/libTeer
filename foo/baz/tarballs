@@ -1,0 +1,5 @@
+tar is a file format and a file archiver program. The program combines multiple files into a single archive file in the tar file format. It was originally developed for magnetic tape computer storage – reading and writing data for a sequential I/O device with no file system, and the name is short for the format description "tape archive". When stored in a file system, a file that tar reads and writes is often called a tarball.
+
+A tarball contains metadata for the contained files including the name, ownership, timestamps, permissions and directory organization. As a file containing other files with associated metadata, a tarball is useful for software distribution and backup.
+
+POSIX abandoned tar in favor of pax, yet tar continues to have widespread use.

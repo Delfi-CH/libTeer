@@ -8,3 +8,6 @@ build
 *.so
 *.a
 *.o
+!foo.tar
+test_*
+!test/*.c

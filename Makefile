@@ -30,8 +30,11 @@ TESTDIR=test
 INCLUDEDIR=include
 BUILDDIR=build
 THIRDPARTY_DIR=thirdparty
-
 PRODUCT=libTar
+
+FOODIR=foo
+DEMOTAR=$(FOODIR).tar
+
 ifeq ($(OUTPUT), shared)
 	PRODUCT=libTar.so
 else
@@ -57,8 +60,8 @@ else
 	OBJ = $(CORE_OBJ)
 endif 
 
-TEST_SRC=$(TESTDIR)/test.c
-TEST_OBJ=$(BUILDDIR)/test
+TEST_SRC=$(TESTDIR)/test_unpack.c
+TEST_OBJ=test_unpack
 
 BZIP2_SRC = bzip2-1.0.8
 BZIP2_OBJ = $(BZIP2_SRC)/libbz2.a
@@ -172,4 +175,16 @@ $(ZSTD_ARCHIVE):
 .PHONY: clean
 
 clean:
-	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR)
+	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_OBJ)
+
+$(DEMOTAR): 
+	tar cf $(DEMOTAR) $(FOODIR)
+
+.PHONY: test
+
+test: all $(TEST_SRC) $(DEMOTAR)
+ifeq ($(OUTPUT), static)
+	$(CC) $(TEST_SRC) $(PRODUCT) -o $(TEST_OBJ)
+else
+	$(CC) $(CFLAGS) $(TEST_SRC) -L$(PWD) -lTar -o $(TEST_OBJ)
+endif

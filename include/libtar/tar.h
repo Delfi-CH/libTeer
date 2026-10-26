@@ -1,10 +1,12 @@
+#define RECORD_LENGTH 512
+
 #ifndef LIBTAR_TAR_H
 #define LIBTAR_TAR_H
 
 // Data structures
 
 typedef struct {
-    char data[512];
+    char data[RECORD_LENGTH];
 } Record;
 
 typedef struct __attribute__((packed)) {
@@ -13,7 +15,7 @@ typedef struct __attribute__((packed)) {
     char owner_id[8];
     char group_id[8];
     char file_size[12];
-    char modif_type[12];
+    char modif_time[12];
     char checksum[8];
     char link;
     char name_linked_file[100];
@@ -26,9 +28,9 @@ typedef struct __attribute__((packed)) {
     char owner_id[8];
     char group_id[8];
     char file_size[12];
-    char modif_type[12];
+    char modif_time[12];
     char checksum[8];
-    char type_flag;
+    char link;
     char name_linked_file[100];
     char indicator[6];
     char version[2];
@@ -45,6 +47,6 @@ typedef struct __attribute__((packed)) {
 void libtar_append();
 void libtar_merge();
 void libtar_create();
-void libtar_unpack();
+int libtar_unpack(const char *filename);
 
 #endif
