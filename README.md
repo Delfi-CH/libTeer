@@ -1,4 +1,4 @@
-# libtar
+# libTeer
 
 library for handeling tarballs
 

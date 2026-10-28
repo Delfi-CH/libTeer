@@ -1,5 +1,5 @@
-#include "../include/libtar/tar.h"
+#include "../include/libTeer/tar.h"
 
-void libtar_append() {
+void libTeer_append() {
     return;
 }

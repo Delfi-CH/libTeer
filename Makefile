@@ -30,21 +30,21 @@ TESTDIR=test
 INCLUDEDIR=include
 BUILDDIR=build
 THIRDPARTY_DIR=thirdparty
-PRODUCT=libTar
+PRODUCT=libTeer
 
 FOODIR=foo
 DEMOTAR=$(FOODIR).tar
 
 ifeq ($(OUTPUT), shared)
-	PRODUCT=libTar.so
+	PRODUCT=libTeer.so
 else
-	PRODUCT=libTar.a
+	PRODUCT=libTeer.a
 endif
 
 ifeq ($(FEATURE_COMPRESSION), true)
-	HEADERS=$(INCLUDEDIR)/libtar/tar.h $(INCLUDEDIR)/libtar/compress.h
+	HEADERS=$(INCLUDEDIR)/libTeer/tar.h $(INCLUDEDIR)/libTeer/compress.h
 else
-	HEADERS=$(INCLUDEDIR)/libtar/tar.h
+	HEADERS=$(INCLUDEDIR)/libTeer/tar.h
 endif
 
 CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c
@@ -186,5 +186,5 @@ test: all $(TEST_SRC) $(DEMOTAR)
 ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_SRC) $(PRODUCT) -o $(TEST_OBJ)
 else
-	$(CC) $(CFLAGS) $(TEST_SRC) -L$(PWD) -lTar -o $(TEST_OBJ)
+	$(CC) $(CFLAGS) $(TEST_SRC) -L$(PWD) -lTeer -o $(TEST_OBJ)
 endif

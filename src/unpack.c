@@ -1,4 +1,4 @@
-#include "../include/libtar/tar.h"
+#include "../include/libTeer/tar.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
@@ -24,14 +24,14 @@ char *read_single_record(FILE *tarball)
 
 bool is_record_ustar_header(char *record)
 {
-    libTar_UStarHeader header;
+    LibTeer_UStarHeader header;
     memcpy(&header, record, sizeof(header));
     if (strncmp(header.indicator, libtar_ustar_indicator, 5))
         return false;
     return true;
 }
 
-void print_header_info(libTar_UStarHeader *header)
+void print_header_info(LibTeer_UStarHeader *header)
 {
     printf("file_path: %s\n", header->file_path);
     printf("file_mode: %ld\n", strtol(header->file_mode, NULL, 10));
@@ -69,8 +69,9 @@ int libtar_unpack(const char *filename)
     FILE *tarball = fopen(filename, "r");
 
     char *buf = malloc(RECORD_LENGTH * sizeof(char));
+    FILE *current_file = NULL;
     char current_filename[255] = {0};
-    libTar_UStarHeader *header = malloc(sizeof(libTar_UStarHeader));
+    LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
     for (int i = 0; i < st.st_size / RECORD_LENGTH; i++)
     {
         buf = read_single_record(tarball);

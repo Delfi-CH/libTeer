@@ -1,10 +1,10 @@
-#include "../../include/libtar/tar.h"
-#include "../../include/libtar/compress.h"
+#include "../../include/libTeer/tar.h"
+#include "../../include/libTeer/compress.h"
 
-void libtar_gzip_decompress() {
+void libTeer_gzip_decompress() {
     return;
 }
 
-void libtar_gzip_compress() {
+void libTeer_gzip_compress() {
     return;
 }

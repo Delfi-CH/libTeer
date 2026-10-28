@@ -1,13 +1,13 @@
 #define RECORD_LENGTH 512
 
-#ifndef LIBTAR_TAR_H
-#define LIBTAR_TAR_H
+#ifndef LIBTEER_TAR_H
+#define LIBTEER_TAR_H
 
 // Data structures
 
 typedef struct {
     char data[RECORD_LENGTH];
-} Record;
+} LibTeer_Record;
 
 typedef struct __attribute__((packed)) {
     char file_path[100];
@@ -20,7 +20,7 @@ typedef struct __attribute__((packed)) {
     char link;
     char name_linked_file[100];
     char padding[255];
-} libTar_StandardHeader;
+} LibTeer_StandardHeader;
 
 typedef struct __attribute__((packed)) {
     char file_path[100];
@@ -40,13 +40,13 @@ typedef struct __attribute__((packed)) {
     char device_minor_number[8];
     char filename_prefix[155];
     char padding[24];
-} libTar_UStarHeader;
+} LibTeer_UStarHeader;
 
 // Functions
 
-void libtar_append();
-void libtar_merge();
-void libtar_create();
-int libtar_unpack(const char *filename);
+void libTeer_append();
+void libTeer_merge();
+void libTeer_create();
+int libTeer_unpack(const char *filename);
 
 #endif
