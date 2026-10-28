@@ -47,6 +47,12 @@ typedef struct __attribute__((packed)) {
 void libTeer_append();
 void libTeer_merge();
 void libTeer_create();
+
+/*
+    Unpack a tar archive into a directory.
+    If the directory is null, the current working directory is used instead.
+    Returns 0 on success and anything else on failiure.
+*/
 int libTeer_unpack(const char *filename, const char *directory);
 
 #endif

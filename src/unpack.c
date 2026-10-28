@@ -56,6 +56,11 @@ void print_header_info(LibTeer_UStarHeader *header)
 
 int libTeer_unpack(const char *filename, const char *directory)
 {
+    if (filename == NULL) {
+        fprintf(stderr, "Filename is null! Aborting...\n");
+        return 1;
+    }
+
     char *initial_working_directory = malloc(4096 * sizeof(char));
     getcwd(initial_working_directory, 4096);
     if (directory == NULL) {
@@ -75,16 +80,38 @@ int libTeer_unpack(const char *filename, const char *directory)
     }
 
     FILE *tarball = fopen(filename, "r");
+    if (tarball == NULL) {
+        fprintf(stderr, "Failed to open file %s!\n", filename);
+        return 1;
+    }
 
-    chdir(directory);
+    if(chdir(directory)) {
+        fprintf(stderr, "Failed to change directory to %s!\n", directory);
+        return 1;
+    }
 
     char *buf = malloc(RECORD_LENGTH * sizeof(char));
+    if (buf == NULL) {
+        fprintf(stderr, "Failed to allocate memory!\n");
+        return 2;
+    }
+
     FILE *current_file = NULL;
     char current_filename[255] = {0};
     LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
+    if (header == NULL) {
+        fprintf(stderr, "Failed to allocate memory!\n");
+        return 2;
+    }
+
     for (int i = 0; i < st.st_size / RECORD_LENGTH; i++)
     {
         buf = read_single_record(tarball);
+        if (buf == NULL) {
+            fprintf(stderr, "Failed to read buffer!\n");
+            return 2;
+        }
+
         if (is_record_ustar_header(buf))
         {   
             memcpy(header, zero_record, sizeof(*header));
@@ -94,19 +121,35 @@ int libTeer_unpack(const char *filename, const char *directory)
             // is it a directory?
             if (header->file_path[strlen(header->file_path) - 1] == '/')
             {
-                stat(header->file_path, &st);
+                if(stat(header->file_path, &st))                
+                {
+                    fprintf(stderr, "Failed to stat file %s!\n", header->file_path);
+                    return 1;
+                }
                 if (S_ISDIR(st.st_mode)) {
                     continue;
                 } else {
-                    mkdir(header->file_path, strtol(header->file_mode, NULL, 8));
+                    if(mkdir(header->file_path, strtol(header->file_mode, NULL, 8))) {
+                        fprintf(stderr, "Failed to make directory %s!\n", header->file_path);
+                        return 1;
+                    };
                 }
             } else {
                 if (current_file != NULL) {
-                    fclose(current_file);
+                    if(fclose(current_file)) {
+                        fprintf(stderr, "Failed to close file %s!\n", current_filename);
+                        return 1;
+                    }
                 }
-                snprintf(current_filename, sizeof(char) * 255, "%s", header->file_path);    
-                printf("current_filename:  %s\n", current_filename);
+                if (snprintf(current_filename, sizeof(char) * 255, "%s", header->file_path) < 0) {
+                    fprintf(stderr, "Failed to write filename %s!\n", header->file_path);
+                        return 1;
+                }  
                 current_file = fopen(current_filename, "w");
+                if (current_file == NULL) {
+                    fprintf(stderr, "Failed to open file %s", current_filename);
+                    return 1;
+                }
             }
         }
         else
@@ -123,5 +166,8 @@ int libTeer_unpack(const char *filename, const char *directory)
     }
 
     chdir(initial_working_directory);
+    free(initial_working_directory);
+    free(buf);
+    free(header);
     return 0;
 }
