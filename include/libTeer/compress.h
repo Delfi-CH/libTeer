@@ -1,6 +1,8 @@
 #ifndef LIBTEER_COMPRESS_H
 #define LIBTEER_COMPRESS_H
 
+// Functions
+
 void libTeer_bzip2_decompress();
 void libTeer_bzip2_compress();
 

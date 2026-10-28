@@ -42,6 +42,18 @@ typedef struct __attribute__((packed)) {
     char padding[24];
 } LibTeer_UStarHeader;
 
+// Enums
+
+typedef enum mode {
+    NOCOMPRESS = 0,
+    GZIP = 1,
+    ZLIB = 1,
+    XZ = 2,
+    LZMA = 2,
+    BZIP2 = 3,
+    ZSTD = 4,
+} libTeer_Compression_Mode;
+
 // Functions
 
 void libTeer_append();

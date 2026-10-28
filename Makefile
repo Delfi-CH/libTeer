@@ -22,6 +22,12 @@ ifeq ($(OUTPUT), shared)
 endif
 
 CFLAGS = -Wall -Werror $(CFLAGS_EXTRA_1) $(CFLAGS_EXTRA_2)
+LDFLAGS =
+ifeq ($(OUTPUT), shared)
+ifeq ($(FEATURE_COMPRESSION), true)
+	LDFLAGS = -lz -lzstd -llzma -lbz2
+endif
+endif
 
 # Directories & Files
 
@@ -42,9 +48,9 @@ else
 endif
 
 ifeq ($(FEATURE_COMPRESSION), true)
-	HEADERS=$(INCLUDEDIR)/libTeer/tar.h $(INCLUDEDIR)/libTeer/compress.h
+	HEADERS = $(INCLUDEDIR)/libTeer/tar.h $(INCLUDEDIR)/libTeer/compress.h
 else
-	HEADERS=$(INCLUDEDIR)/libTeer/tar.h
+	HEADERS = $(INCLUDEDIR)/libTeer/tar.h
 endif
 
 CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c
@@ -99,7 +105,7 @@ $(THIRDPARTY_DIR):
 
 ifeq ($(OUTPUT), shared)
 $(PRODUCT): $(OBJ)
-	$(CC) -shared $(OBJ) -o $(PRODUCT)
+	$(CC) -shared $(OBJ) $(LDFLAGS) -o $(PRODUCT)
 else 
 ifeq ($(FEATURE_COMPRESSION), true)
 $(PRODUCT): $(THIRDPARTY_DIR) $(OBJ) $(COMPRESS_EXTERNAL_OBJ)
