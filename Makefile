@@ -1,6 +1,6 @@
 # Feature flags
 
-FEATURE_COMPRESSION = false
+FEATURE_COMPRESSION = true
 
 # To use compression with shared libraries, you need libbz2, zlib, liblzma and libzstd
 
@@ -10,8 +10,8 @@ MAKEFLAGS_BUNDLED_LIBRARIES = -j4
 
 # Compiler options
 
-CC = clang
-AR = llvm-ar
+CC = gcc
+AR = gcc-ar
 ifeq ($(CC), clang)
 	CFLAGS_EXTRA_1 = -fsanitize=memory
 endif
@@ -54,8 +54,8 @@ else
 	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h
 endif
 
-CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c
-CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o
+CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c
+CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o
 
 COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/compress/xz.c $(SRCDIR)/compress/zstd.c
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
@@ -67,8 +67,11 @@ else
 	OBJ = $(CORE_OBJ)
 endif 
 
-TEST_SRC=$(TESTDIR)/test_unpack.c
-TEST_OBJ=test_unpack
+TEST_UNPACK_SRC=$(TESTDIR)/test_unpack.c 
+TEST_UNPACK_OBJ=test_unpack
+
+TEST_UNPACK_GZIP_SRC=$(TESTDIR)/test_unpack_gzip.c 
+TEST_UNPACK_GZIP_OBJ=test_unpack_gzip
 
 BZIP2_SRC = bzip2-1.0.8
 BZIP2_OBJ = $(BZIP2_SRC)/libbz2.a
@@ -182,18 +185,27 @@ $(ZSTD_ARCHIVE):
 .PHONY: clean
 
 clean:
-	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_OBJ)
+	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_UNPACK_GZIP_OBJ)
 
 $(DEMOTAR): 
 	tar cf $(DEMOTAR) $(FOODIR)
 
 .PHONY: test
+.PHONY: download-test-files
 
-test: all $(TEST_SRC) $(DEMOTAR)
+download-test-files:
+	rm -rf /tmp/minowebd*
+	cd /tmp && wget https://github.com/Delfi-CH/minopanel/releases/download/v0.8.0/minowebd-0.8.0-amd64.tar.gz
+
+test: all $(TEST_SRC) $(DEMOTAR) download-test-files
 ifeq ($(OUTPUT), static)
-	$(CC) $(TEST_SRC) $(PRODUCT) -o $(TEST_OBJ)
+	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ)
+	$(CC) $(TEST_UNPACK_GZIP_SRC) $(PRODUCT) -o $(TEST_UNPACK_GZIP_OBJ)
 else
-	$(CC) $(CFLAGS) $(TEST_SRC) -L$(PWD) -lTeer -o $(TEST_OBJ)
+	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ)
+	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_OBJ)
+	$(CC) $(CFLAGS) $(TEST_UNPACK_GZIP_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_GZIP_OBJ)
+	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_GZIP_OBJ)
 endif
 
 PREFIX ?= /usr

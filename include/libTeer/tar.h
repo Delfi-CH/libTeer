@@ -1,4 +1,4 @@
-#define RECORD_LENGTH 512
+#define LIBTEER_RECORD_LENGTH 512
 
 #ifndef LIBTEER_TAR_H
 #define LIBTEER_TAR_H
@@ -6,7 +6,7 @@
 // Data structures
 
 typedef struct {
-    char data[RECORD_LENGTH];
+    char data[LIBTEER_RECORD_LENGTH];
 } LibTeer_Record;
 
 typedef struct __attribute__((packed)) {
@@ -39,7 +39,7 @@ typedef struct __attribute__((packed)) {
     char device_major_number[8];
     char device_minor_number[8];
     char filename_prefix[155];
-    char padding[24];
+    char padding[12];
 } LibTeer_UStarHeader;
 
 // Enums
