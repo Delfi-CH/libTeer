@@ -36,21 +36,22 @@ TESTDIR=test
 INCLUDEDIR=include
 BUILDDIR=build
 THIRDPARTY_DIR=thirdparty
-PRODUCT=libTeer
+NAME=libTeer
+PRODUCT=
 
 FOODIR=foo
 DEMOTAR=$(FOODIR).tar
 
 ifeq ($(OUTPUT), shared)
-	PRODUCT=libTeer.so
+	PRODUCT=$(NAME).so
 else
-	PRODUCT=libTeer.a
+	PRODUCT=$(NAME).a
 endif
 
 ifeq ($(FEATURE_COMPRESSION), true)
-	HEADERS = $(INCLUDEDIR)/libTeer/tar.h $(INCLUDEDIR)/libTeer/compress.h
+	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h $(INCLUDEDIR)/$(NAME)/compress.h
 else
-	HEADERS = $(INCLUDEDIR)/libTeer/tar.h
+	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h
 endif
 
 CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c
@@ -193,4 +194,19 @@ ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_SRC) $(PRODUCT) -o $(TEST_OBJ)
 else
 	$(CC) $(CFLAGS) $(TEST_SRC) -L$(PWD) -lTeer -o $(TEST_OBJ)
+endif
+
+PREFIX ?= /usr
+LIBDIR = $(PREFIX)/lib
+SYS_INCLUDEDIR = $(PREFIX)/include
+
+.PHONY: install
+
+install: all
+	install -d $(DESTDIR)$(LIBDIR)
+	install -d $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)
+	install -m 644 $(PRODUCT) $(DESTDIR)$(LIBDIR)/$(PRODUCT)
+	install -m $(INCLUDEDIR)/$(NAME)/tar.h $(DESTDIR)$(SYS_INCLUDEDIR)/tar.h
+ifeq ($(FEATURE_COMPRESSION), true)
+	install -m $(INCLUDEDIR)/$(NAME)/compress.h $(DESTDIR)$(SYS_INCLUDEDIR)/compress.h
 endif
