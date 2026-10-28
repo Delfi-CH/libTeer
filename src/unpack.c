@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 const char libtar_ustar_indicator[6] = "ustar";
@@ -53,8 +54,13 @@ void print_header_info(LibTeer_UStarHeader *header)
     printf("filename_prefix: %s\n", header->filename_prefix);
 }
 
-int libTeer_unpack(const char *filename)
+int libTeer_unpack(const char *filename, const char *directory)
 {
+    char *initial_working_directory = malloc(4096 * sizeof(char));
+    getcwd(initial_working_directory, 4096);
+    if (directory == NULL) {
+        directory = initial_working_directory;
+    }
     struct stat st;
     if (stat(filename, &st))
     {
@@ -69,6 +75,8 @@ int libTeer_unpack(const char *filename)
     }
 
     FILE *tarball = fopen(filename, "r");
+
+    chdir(directory);
 
     char *buf = malloc(RECORD_LENGTH * sizeof(char));
     FILE *current_file = NULL;
@@ -114,5 +122,6 @@ int libTeer_unpack(const char *filename)
         }
     }
 
+    chdir(initial_working_directory);
     return 0;
 }

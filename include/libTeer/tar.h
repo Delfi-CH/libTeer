@@ -47,6 +47,6 @@ typedef struct __attribute__((packed)) {
 void libTeer_append();
 void libTeer_merge();
 void libTeer_create();
-int libTeer_unpack(const char *filename);
+int libTeer_unpack(const char *filename, const char *directory);
 
 #endif
