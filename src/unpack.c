@@ -7,6 +7,8 @@
 
 const char libtar_ustar_indicator[6] = "ustar";
 
+const char zero_record[512] = {0};
+
 char *read_single_record(FILE *tarball)
 {
     char *buffer = malloc(RECORD_LENGTH * sizeof(char));
@@ -51,7 +53,7 @@ void print_header_info(LibTeer_UStarHeader *header)
     printf("filename_prefix: %s\n", header->filename_prefix);
 }
 
-int libtar_unpack(const char *filename)
+int libTeer_unpack(const char *filename)
 {
     struct stat st;
     if (stat(filename, &st))
@@ -76,7 +78,8 @@ int libtar_unpack(const char *filename)
     {
         buf = read_single_record(tarball);
         if (is_record_ustar_header(buf))
-        {
+        {   
+            memcpy(header, zero_record, sizeof(*header));
             memcpy(header, buf, sizeof(*header));
             print_header_info(header);
 
@@ -90,14 +93,22 @@ int libtar_unpack(const char *filename)
                     mkdir(header->file_path, strtol(header->file_mode, NULL, 8));
                 }
             } else {
-
+                if (current_file != NULL) {
+                    fclose(current_file);
+                }
+                snprintf(current_filename, sizeof(char) * 255, "%s", header->file_path);    
+                printf("current_filename:  %s\n", current_filename);
+                current_file = fopen(current_filename, "w");
             }
         }
         else
         {
             for (int i = 0; i < RECORD_LENGTH; i++)
             {
-                printf("%c", buf[i]);
+                if (buf[i] != '\0') {
+                    fputc(buf[i], current_file);
+                    printf("%c", buf[i]);
+                }
             }
             printf("\n");
         }
