@@ -2,6 +2,30 @@
 
 library for handeling tarballs
 
+## Features:
+
+**Tar formats:**
+
+- [ ] unix v7 tar support
+- [x] ustar support
+- [ ] GNU tar support
+- [ ] pax support
+
+**Operations:**
+
+- [ ] Creating archives
+- [x] Unpacking archives
+- [ ] Appending to archives
+- [ ] Merging archives
+
+**(De)Compression:**
+
+- [x] gzip
+- [ ] xz/lzma
+- [ ] bz2
+- [ ] zstd
+
+
 ## Usage
 
 ### Basic examples
