@@ -1,0 +1,26 @@
+pkgname=libTeer
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Library for handleing tarballs"
+arch=('x86_64')
+url="https://github.com/Delfi-CH/libTeer"
+license=('LGPL-2.1-only')
+depends=('glibc' 'zlib' 'xz' 'bzip2' 'zstd')
+makedepends=('git' 'gcc' 'make')
+provides=('libTeer')
+conflicts=('libTeer-git')
+
+source=("https://github.com/Delfi-CH/libTeer/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+
+build() {
+    cd "$pkgname"-"$pkgver"
+    make OUTPUT=shared CC=gcc VERSION="$pkgver"
+}
+
+package() {
+    cd "$pkgname"-"$pkgver"
+    make install DESTDIR="$pkgdir"
+    install -Dm 644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

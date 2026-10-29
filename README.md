@@ -2,6 +2,27 @@
 
 library for handeling tarballs
 
+## Installation
+
+**Arch Linux:**
+
+```bash
+git clone https://github.com/Delfi-CH/libTeer.git
+cd libTeer
+make archlinux-install
+```
+
+or
+
+```bash
+wget https://raw.githubusercontent.com/Delfi-CH/libTeer/refs/heads/main/pkg/PKGBUILD
+makepkg -si
+```
+
+**Other platforms:**
+
+See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/libTeer#building)
+
 ## Features:
 
 **Tar formats:**
@@ -136,4 +157,10 @@ make CC=clang
 
 make CC=clang FEATURE_MSAN=true FEATURE_COMPRESSION=false
 # builds the base library with the memory sanitizer 
+
+make archlinux-install
+# build and install an Arch Linux PKGBUILD 
+
+make PKGTYPE=git archlinux-install 
+# build and install an Arch Linux PKGBUILD, made from the latest git commit 
 ```

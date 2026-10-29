@@ -2,6 +2,7 @@
 
 FEATURE_COMPRESSION = true
 FEATUR_MSAN = false
+PKGTYPE = release
 
 VERSION ?= $(shell git rev-parse HEAD)
 
@@ -240,8 +241,6 @@ ifeq ($(FEATURE_COMPRESSION), true)
 endif
 
 .PHONY: archlinux-install
-
-PKGTYPE=release
 
 archlinux-install:
 	cat /etc/os-release | grep "Arch Linux" || { echo "Not on Arch Linux!"; exit 1; }
