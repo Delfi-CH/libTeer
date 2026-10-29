@@ -1,7 +1,7 @@
 # Feature flags
 
 FEATURE_COMPRESSION = true
-FEATUR_MSAN = false
+FEATURE_MSAN = false
 PKGTYPE = release
 
 VERSION ?= $(shell git rev-parse HEAD)
@@ -18,7 +18,7 @@ CC = gcc
 AR = gcc-ar
 CFLAGS_EXTRA_1 = 
 ifeq ($(CC), clang)
-ifeq ($(FEATUR_MSAN), true)
+ifeq ($(FEATURE_MSAN), true)
 ifeq ($(FEATURE_COMPRESSION), false)
 	CFLAGS_EXTRA_1 = -fsanitize=memory
 endif
