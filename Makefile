@@ -1,6 +1,7 @@
 # Feature flags
 
 FEATURE_COMPRESSION = true
+FEATUR_MSAN = false
 
 # To use compression with shared libraries, you need libbz2, zlib, liblzma and libzstd
 
@@ -12,8 +13,13 @@ MAKEFLAGS_BUNDLED_LIBRARIES = -j4
 
 CC = gcc
 AR = gcc-ar
+CFLAGS_EXTRA_1 = 
 ifeq ($(CC), clang)
+ifeq ($(FEATUR_MSAN), true)
+ifeq ($(FEATURE_COMPRESSION), false)
 	CFLAGS_EXTRA_1 = -fsanitize=memory
+endif
+endif
 endif
 
 OUTPUT = shared
@@ -218,7 +224,7 @@ install: all
 	install -d $(DESTDIR)$(LIBDIR)
 	install -d $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)
 	install -m 644 $(PRODUCT) $(DESTDIR)$(LIBDIR)/$(PRODUCT)
-	install -m $(INCLUDEDIR)/$(NAME)/tar.h $(DESTDIR)$(SYS_INCLUDEDIR)/tar.h
+	install -m 644 $(INCLUDEDIR)/$(NAME)/tar.h $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)/tar.h
 ifeq ($(FEATURE_COMPRESSION), true)
-	install -m $(INCLUDEDIR)/$(NAME)/compress.h $(DESTDIR)$(SYS_INCLUDEDIR)/compress.h
+	install -m 644 $(INCLUDEDIR)/$(NAME)/compress.h $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)/compress.h
 endif

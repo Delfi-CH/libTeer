@@ -5,6 +5,12 @@
 
 // Data structures
 
+/*
+    Data structures taken from
+    https://github.com/tsoding/tarballs/
+    which is MIT-licensed
+*/
+
 typedef struct {
     char data[LIBTEER_RECORD_LENGTH];
 } LibTeer_Record;

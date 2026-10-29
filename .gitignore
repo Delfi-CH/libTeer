@@ -11,3 +11,4 @@ build
 !foo.tar
 test_*
 !test/*.c
+thirdparty
