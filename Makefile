@@ -3,6 +3,8 @@
 FEATURE_COMPRESSION = true
 FEATUR_MSAN = false
 
+VERSION ?= $(shell git rev-parse HEAD)
+
 # To use compression with shared libraries, you need libbz2, zlib, liblzma and libzstd
 
 # Compression library makeflags
@@ -27,7 +29,7 @@ ifeq ($(OUTPUT), shared)
 	CFLAGS_EXTRA_2 = -fPIC
 endif
 
-CFLAGS = -Wall -Werror $(CFLAGS_EXTRA_1) $(CFLAGS_EXTRA_2)
+CFLAGS = -Wall -Werror $(CFLAGS_EXTRA_1) $(CFLAGS_EXTRA_2) -DLIBTAR_VERSION_STRING=\"$(VERSION)\"
 LDFLAGS =
 ifeq ($(OUTPUT), shared)
 ifeq ($(FEATURE_COMPRESSION), true)
@@ -42,6 +44,7 @@ TESTDIR=test
 INCLUDEDIR=include
 BUILDDIR=build
 THIRDPARTY_DIR=thirdparty
+PKGFILESDIR=pkg
 NAME=libTeer
 PRODUCT=
 
@@ -81,6 +84,9 @@ TEST_UNPACK_GZIP_OBJ=test_unpack_gzip
 
 TEST_UNPACK_ZSTD_SRC=$(TESTDIR)/test_unpack_zstd.c 
 TEST_UNPACK_ZSTD_OBJ=test_unpack_zstd
+
+TEST_VERSION_SRC=$(TESTDIR)/test_version.c 
+TEST_VERSION_OBJ=test_version
 
 BZIP2_SRC = bzip2-1.0.8
 BZIP2_OBJ = $(BZIP2_SRC)/libbz2.a
@@ -206,6 +212,7 @@ ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ)
 	$(CC) $(TEST_UNPACK_GZIP_SRC) $(PRODUCT) -o $(TEST_UNPACK_GZIP_OBJ)
 	$(CC) $(TEST_UNPACK_ZSTD_SRC) $(PRODUCT) -o $(TEST_UNPACK_ZSTD_OBJ)
+	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ)
 else
 	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_OBJ)
@@ -213,6 +220,8 @@ else
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_GZIP_OBJ)
 	$(CC) $(CFLAGS) $(TEST_UNPACK_ZSTD_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_ZSTD_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_ZSTD_OBJ)
+	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ)
+	LD_LIBRARY_PATH=$(PWD) ./$(TEST_VERSION_OBJ)
 endif
 
 PREFIX ?= /usr
@@ -229,3 +238,17 @@ install: all
 ifeq ($(FEATURE_COMPRESSION), true)
 	install -m 644 $(INCLUDEDIR)/$(NAME)/compress.h $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)/compress.h
 endif
+
+.PHONY: archlinux-install
+
+PKGTYPE=release
+
+archlinux-install:
+	cat /etc/os-release | grep "Arch Linux" || { echo "Not on Arch Linux!"; exit 1; }
+ifeq ($(PKGTYPE), release)
+	cp $(PKGFILESDIR)/PKGBUILD /tmp/PKGBUILD
+endif
+ifeq ($(PKGTYPE), git)
+	cp $(PKGFILESDIR)/PKGBUILD-git /tmp/PKGBUILD
+endif
+	cd /tmp && makepkg -si

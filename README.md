@@ -125,6 +125,9 @@ make test
 make clean
 # removes all artifacts from the directories
 
+make VERSION=0.1.0
+# use a specific version string instead of the latest commit
+
 make OUTPUT=static
 # creates a .a archive instead of a shared object for static linking. if FEATURE_COMPRESSION=true, it will also build static versions of the compression libraries in thirdparty/
 

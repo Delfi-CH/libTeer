@@ -1,5 +1,9 @@
 #define LIBTEER_RECORD_LENGTH 512
 
+#ifndef LIBTAR_VERSION_STRING
+#define LIBTAR_VERSION_STRING "unknown"
+#endif
+
 #ifndef LIBTEER_TAR_H
 #define LIBTEER_TAR_H
 
@@ -72,5 +76,7 @@ void libTeer_create();
     Returns 0 on success and anything else on failiure.
 */
 int libTeer_unpack(const char *filename, const char *directory);
+
+char *libTeer_get_version();
 
 #endif

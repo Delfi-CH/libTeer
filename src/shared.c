@@ -62,3 +62,7 @@ void print_ustar_header_info(LibTeer_UStarHeader *header)
     printf("device_minor_number: %ld\n", strtol(header->device_minor_number, NULL, 10));
     printf("filename_prefix: %s\n", header->filename_prefix);
 }
+
+char *libTeer_get_version() {
+    return LIBTAR_VERSION_STRING;   
+}
