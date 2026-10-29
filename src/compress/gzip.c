@@ -61,7 +61,56 @@ int libTeer_gzip_decompress(const char *infile, const char *outfile)
 
 int libTeer_gzip_compress(const char *infile, const char *outfile)
 {
-    return 0;
+    FILE *in = fopen(infile, "rb");
+    if (in == NULL)
+    {
+        fprintf(stderr, "Failed to open file %s\n", infile);
+        return 1;
+    }
+
+    gzFile out = gzopen(outfile, "wb");
+    if (out == NULL)
+    {
+        fprintf(stderr, "Failed to open file %s\n", outfile);
+        fclose(in);
+        return 1;
+    }
+
+    char buf[LIBTEER_COMPRESSION_BUFFER_SIZE] = {0};
+    size_t read;
+    int result = 0;
+
+    while ((read = fread(buf, 1, sizeof(buf), in)) > 0)
+    {
+        int written = gzwrite(out, buf, read);
+        if ((size_t)written != read)
+        {
+            fprintf(stderr, "gzwrite failed\n");
+            break;
+        }
+    }
+
+    if (read < 0)
+    {
+        int errnum;
+        fprintf(stderr, "Compression failed: %s\n",
+                gzerror(out, &errnum));
+        result = 1;
+    }
+
+    if (fclose(in) != 0)
+    {
+        fprintf(stderr, "Failed to close input file %s\n", infile);
+        result = 1;
+    }
+
+    if (gzclose(out) != Z_OK)
+    {
+        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        result = 1;
+    }
+
+    return result;
 }
 
 int libTeer_gzip_unpack(const char *filename, const char *directory)
