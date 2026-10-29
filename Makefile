@@ -196,17 +196,12 @@ $(ZSTD_ARCHIVE):
 clean:
 	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_UNPACK_GZIP_OBJ)
 
-$(DEMOTAR): 
-	tar cf $(DEMOTAR) $(FOODIR)
-
 .PHONY: test
-.PHONY: download-test-files
 
-download-test-files:
-	rm -rf /tmp/minowebd*
-	cd /tmp && wget https://github.com/Delfi-CH/minopanel/releases/download/v0.8.0/minowebd-0.8.0-amd64.tar.gz
-
-test: all $(TEST_SRC) $(DEMOTAR) download-test-files
+test: all $(TEST_SRC)
+	tar cf $(DEMOTAR) $(FOODIR)
+	tar czf $(DEMOTAR).gz $(FOODIR)
+	tar --zstd --create --file $(DEMOTAR).zstd $(FOODIR)
 ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ)
 	$(CC) $(TEST_UNPACK_GZIP_SRC) $(PRODUCT) -o $(TEST_UNPACK_GZIP_OBJ)
