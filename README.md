@@ -23,7 +23,7 @@ library for handeling tarballs
 - [x] gzip
 - [ ] xz/lzma
 - [ ] bz2
-- [ ] zstd
+- [x] zstd
 
 
 ## Usage

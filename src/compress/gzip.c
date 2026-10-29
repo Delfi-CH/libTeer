@@ -56,6 +56,10 @@ int libTeer_gzip_decompress(const char *infile, const char *outfile)
         result = 1;
     }
 
+    if (result) {
+        remove(outfile);
+    }
+
     return result;
 }
 
@@ -110,6 +114,10 @@ int libTeer_gzip_compress(const char *infile, const char *outfile)
         result = 1;
     }
 
+    if (result) {
+        remove(outfile);
+    }
+
     return result;
 }
 
@@ -128,7 +136,7 @@ int libTeer_gzip_unpack(const char *filename, const char *directory)
     rc = libTeer_gzip_decompress(filename, rand_filename);
     if (rc != 0)
     {
-        fprintf(stderr, "error: could not decmopress %s\n", filename);
+        fprintf(stderr, "error: could not decompress %s\n", filename);
         return 1;
     }
     rc = libTeer_unpack(rand_filename, directory);
@@ -137,6 +145,8 @@ int libTeer_gzip_unpack(const char *filename, const char *directory)
         fprintf(stderr, "error: could not unpack %s\n", rand_filename);
         return 1;
     }
+
+    remove(rand_filename);
 
     return 0;
 }
