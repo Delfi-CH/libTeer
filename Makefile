@@ -55,9 +55,9 @@ else
 endif
 
 ifeq ($(FEATURE_COMPRESSION), true)
-	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h $(INCLUDEDIR)/$(NAME)/compress.h
+	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h $(INCLUDEDIR)/$(NAME)/compress.h $(INCLUDEDIR)/$(NAME)/private.h 
 else
-	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h
+	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h $(INCLUDEDIR)/$(NAME)/private.h 
 endif
 
 CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c
