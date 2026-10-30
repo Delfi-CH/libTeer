@@ -64,5 +64,5 @@ void print_ustar_header_info(LibTeer_UStarHeader *header)
 }
 
 char *libTeer_get_version() {
-    return LIBTAR_VERSION_STRING;   
+    return LIBTEER_VERSION_STRING;   
 }

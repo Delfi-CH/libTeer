@@ -1,7 +1,7 @@
 #define LIBTEER_RECORD_LENGTH 512
 
-#ifndef LIBTAR_VERSION_STRING
-#define LIBTAR_VERSION_STRING "unknown"
+#ifndef LIBTEER_VERSION_STRING
+#define LIBTEER_VERSION_STRING "unknown"
 #endif
 
 #ifndef LIBTEER_TAR_H
