@@ -5,8 +5,15 @@
 
 // Functions
 
-void libTeer_bzip2_decompress();
-void libTeer_bzip2_compress();
+int libTeer_bzip2_decompress(const char *infile, const char *outfile);
+int libTeer_bzip2_compress(const char *infile, const char *outfile, int compression_level, int work_factor);
+
+/*
+    Decompress and unpack a tar archive into a directory.
+    If the directory is null, the current working directory is used instead.
+    Returns 0 on success and anything else on failiure.
+*/
+int libTeer_bzip2_unpack(const char *filename, const char *directory);
 
 /*
 decompresses infile to outfile.

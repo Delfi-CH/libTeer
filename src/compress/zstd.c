@@ -107,7 +107,7 @@ int libTeer_zstd_decompress(const char *infile, const char *outfile) {
 
 int libTeer_zstd_compress(const char *infile, const char *outfile, int compression_level) {
     if (compression_level < ZSTD_minCLevel() || compression_level > ZSTD_maxCLevel()) {
-        fprintf(stderr, "Compression level to large! Use a value from %d to %d\n", ZSTD_minCLevel(), ZSTD_maxCLevel());
+        fprintf(stderr, "Compression level out of bounds! Use a value from %d to %d\n", ZSTD_minCLevel(), ZSTD_maxCLevel());
         return -1;
     }
 

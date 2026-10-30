@@ -43,7 +43,7 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 
 - [x] gzip
 - [ ] xz/lzma
-- [ ] bz2
+- [x] bz2
 - [x] zstd
 
 
