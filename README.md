@@ -2,6 +2,8 @@
 
 library for handeling tarballs
 
+current version: v0.3.0
+
 ## Installation
 
 **Arch Linux:**
