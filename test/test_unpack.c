@@ -1,4 +1,4 @@
-#include "../include/libTeer/tar.h"
+#include "../include/libTeer.h"
 #include <stdio.h>
 
 int main() {

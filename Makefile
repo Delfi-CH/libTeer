@@ -16,21 +16,20 @@ MAKEFLAGS_BUNDLED_LIBRARIES = -j4
 
 CC = gcc
 AR = gcc-ar
-CFLAGS_EXTRA_1 = 
+CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
 ifeq ($(CC), clang)
 ifeq ($(FEATURE_MSAN), true)
 ifeq ($(FEATURE_COMPRESSION), false)
-	CFLAGS_EXTRA_1 = -fsanitize=memory
+	CFLAGS += -fsanitize=memory
 endif
 endif
 endif
 
 OUTPUT = shared
 ifeq ($(OUTPUT), shared)
-	CFLAGS_EXTRA_2 = -fPIC
+	CFLAGS += -fPIC
 endif
 
-CFLAGS = -Wall -Werror $(CFLAGS_EXTRA_1) $(CFLAGS_EXTRA_2) -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
 LDFLAGS =
 ifeq ($(OUTPUT), shared)
 ifeq ($(FEATURE_COMPRESSION), true)
@@ -58,11 +57,12 @@ else
 	PRODUCT=$(NAME).a
 endif
 
+HEADERS = $(INCLUDEDIR)/$(NAME).h $(INCLUDEDIR)/$(NAME)/private.h 
+
 ifeq ($(FEATURE_COMPRESSION), true)
-	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h $(INCLUDEDIR)/$(NAME)/compress.h $(INCLUDEDIR)/$(NAME)/private.h 
-else
-	HEADERS = $(INCLUDEDIR)/$(NAME)/tar.h $(INCLUDEDIR)/$(NAME)/private.h 
+	HEADERS += $(INCLUDEDIR)/$(NAME)/compress.h
 endif
+
 
 CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c
 CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o
@@ -71,9 +71,15 @@ COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/co
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
 COMPRESS_EXTERNAL_OBJ = $(THIRDPARTY_DIR)/libbz2.a $(THIRDPARTY_DIR)/libz.a $(THIRDPARTY_DIR)/liblzma.a $(THIRDPARTY_DIR)/libzstd.a
 
+STUB_SRC = src/stub.c
+STUB_OBJ = build/stub.o
+
+
 ifeq ($(FEATURE_COMPRESSION), true)
 	OBJ = $(CORE_OBJ) $(COMPRESS_OBJ)
 else
+	CORE_SRC += $(STUB_SRC)
+	CORE_OBJ += $(STUB_OBJ)
 	OBJ = $(CORE_OBJ)
 endif 
 
@@ -247,12 +253,9 @@ SYS_INCLUDEDIR = $(PREFIX)/include
 
 install: all
 	install -d $(DESTDIR)$(LIBDIR)
-	install -d $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)
+	install -d $(DESTDIR)$(SYS_INCLUDEDIR)
 	install -m 644 $(PRODUCT) $(DESTDIR)$(LIBDIR)/$(PRODUCT)
-	install -m 644 $(INCLUDEDIR)/$(NAME)/tar.h $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)/tar.h
-ifeq ($(FEATURE_COMPRESSION), true)
-	install -m 644 $(INCLUDEDIR)/$(NAME)/compress.h $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME)/compress.h
-endif
+	install -m 644 $(INCLUDEDIR)/$(NAME).h $(DESTDIR)$(SYS_INCLUDEDIR)/$(NAME).h
 
 .PHONY: archlinux-install
 

@@ -53,7 +53,7 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 
 #### Unpacking
 ```c
-#include <libTeer/tar.h>
+#include <libTeer.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {

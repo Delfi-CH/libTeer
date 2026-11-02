@@ -1,4 +1,4 @@
-#include "../include/libTeer/tar.h"
+#include "../include/libTeer.h"
 #include "../include/libTeer/private.h"
 #include <stdio.h>
 #include <stdbool.h>

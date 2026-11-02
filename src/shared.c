@@ -1,5 +1,5 @@
 #include "../include/libTeer/private.h"
-#include "../include/libTeer/tar.h"
+#include "../include/libTeer.h"
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
