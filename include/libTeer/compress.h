@@ -5,7 +5,14 @@
 
 // Functions
 
+/*
+decompresses infile to outfile.
+*/
 int libTeer_bzip2_decompress(const char *infile, const char *outfile);
+
+/*
+compresses infile to outfile.
+*/
 int libTeer_bzip2_compress(const char *infile, const char *outfile, int compression_level, int work_factor);
 
 /*
@@ -32,8 +39,10 @@ int libTeer_gzip_compress(const char *infile, const char *outfile);
 */
 int libTeer_gzip_unpack(const char *filename, const char *directory);
 
-void libTeer_xz_decompress();
-void libTeer_xz_compress();
+int libTeer_xz_decompress(const char *infile, const char *outfile);
+int libTeer_xz_compress(const char *infile, const char *outfile, int compression_level);
+int libTeer_xz_unpack(const char *filename, const char *directory);
+
 
 /*
 decompresses infile to outfile.

@@ -42,7 +42,7 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 **(De)Compression:**
 
 - [x] gzip
-- [ ] xz/lzma
+- [x] xz/lzma
 - [x] bz2
 - [x] zstd
 
