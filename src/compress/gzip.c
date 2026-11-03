@@ -139,7 +139,7 @@ int libTeer_gzip_unpack(const char *filename, const char *directory)
         fprintf(stderr, "error: could not decompress %s\n", filename);
         return 1;
     }
-    rc = libTeer_unpack(rand_filename, directory);
+    rc = libTeer_basic_unpack(rand_filename, directory);
     if (rc < 0)
     {
         fprintf(stderr, "error: could not unpack %s\n", rand_filename);

@@ -1,13 +1,12 @@
 #include "../include/libTeer.h"
 #include "../include/libTeer/private.h"
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
-int libTeer_unpack(const char *filename, const char *directory)
+int libTeer_basic_unpack(const char *filename, const char *directory)
 {
     if (filename == NULL) {
         fprintf(stderr, "Filename is null! Aborting...\n");
@@ -123,4 +122,54 @@ int libTeer_unpack(const char *filename, const char *directory)
     free(buf);
     free(header);
     return 0;
+}
+
+int libTeer_unpack(const char *filename, const char *directory, libTeer_Compression_Mode compression_mode) {
+    int rc = 0;
+    libTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
+    if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
+        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE);
+        rc = 1;
+        return rc;
+    }
+
+    if (compression_mode == 0) {
+        used_mode = get_mode_from_filename(filename);
+        if (used_mode == -1) {
+            rc = -2;
+            return rc;
+        }
+    } else {
+        used_mode = compression_mode;
+    }
+
+
+    switch (used_mode)
+    {
+    case NOCOMPRESS:
+        rc = libTeer_basic_unpack(filename, directory);
+        break;
+    case GZIP:
+        rc = libTeer_gzip_unpack(filename, directory);
+        break;
+    case XZ:
+        rc = libTeer_xz_unpack(filename, directory);
+        break;
+    case BZIP2:
+        rc = libTeer_bzip2_unpack(filename, directory);
+        break;
+    case ZSTD:
+        rc = libTeer_zstd_unpack(filename, directory);
+        break;
+    case AUTO_COMPRESSION:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    case COMPRESSION_MODE_SIZE:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    }
+
+    return rc;
 }

@@ -59,16 +59,33 @@ typedef struct __attribute__((packed))
 
 typedef enum mode
 {
-    NOCOMPRESS = 0,
-    GZIP = 1,
-    ZLIB = 1,
-    XZ = 2,
-    LZMA = 2,
-    BZIP2 = 3,
-    ZSTD = 4,
+    AUTO_COMPRESSION = 0,
+    NOCOMPRESS = 1,
+    GZIP = 2,
+    ZLIB = 2,
+    XZ = 3,
+    LZMA = 3,
+    BZIP2 = 4,
+    ZSTD = 5,
+    COMPRESSION_MODE_SIZE
 } libTeer_Compression_Mode;
 
+typedef enum format
+{
+    AUTO_FORMAT = 0,
+    POSIX = 1,
+    USTAR = 2,
+    PAX = 3,
+    GNU = 4,
+    OLDGNU = 5,
+} libTeer_File_Format;
+
 // Functions
+
+/*
+    Get the current version string, returns a semver-like format for releases eg. (0.1.1) or the git commit hash.
+*/
+char *libTeer_get_version();
 
 void libTeer_append();
 void libTeer_merge();
@@ -76,18 +93,21 @@ void libTeer_create();
 
 /*
     Unpack a tar archive into a directory.
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
+    If the directory is null, the current working directory is used instead.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+int libTeer_unpack(const char *filename, const char *directory, libTeer_Compression_Mode compression_mode);
+
+/*
+    Unpack an uncompressed tar archive into a directory.
     If the directory is null, the current working directory is used instead.
     Returns 0 on success and anything else on failiure.
 */
-int libTeer_unpack(const char *filename, const char *directory);
+int libTeer_basic_unpack(const char *filename, const char *directory);
 
 /*
-    Get the current version string, returns a semver-like format for releases eg. (0.1.1) or the git commit hash.
-*/
-char *libTeer_get_version();
-
-/*
-    Decompress and unpack a tar archive into a directory.
+    Decompress and unpack a gzip compressed tar archive into a directory.
     If the directory is null, the current working directory is used instead.
     Returns 0 on success and anything else on failiure.
     If the library wasn't compiled with compression, it will always return -2 and do nothing.
@@ -95,15 +115,15 @@ char *libTeer_get_version();
 int libTeer_gzip_unpack(const char *filename, const char *directory);
 
 /*
-Decompress and unpack a tar archive into a directory.
-If the directory is null, the current working directory is used instead.
-Returns 0 on success and anything else on failiure.
-If the library wasn't compiled with compression, it will always return -2 and do nothing.
+    Decompress and unpack an xz/lzma compressed tar archive into a directory.
+    If the directory is null, the current working directory is used instead.
+    Returns 0 on success and anything else on failiure.
+    If the library wasn't compiled with compression, it will always return -2 and do nothing.
 */
 int libTeer_xz_unpack(const char *filename, const char *directory);
 
 /*
-    Decompress and unpack a tar archive into a directory.
+    Decompress and unpack a zstd compressed tar archive into a directory.
     If the directory is null, the current working directory is used instead.
     Returns 0 on success and anything else on failiure.
     If the library wasn't compiled with compression, it will always return -2 and do nothing.
@@ -111,7 +131,7 @@ int libTeer_xz_unpack(const char *filename, const char *directory);
 int libTeer_zstd_unpack(const char *filename, const char *directory);
 
 /*
-    Decompress and unpack a tar archive into a directory.
+    Decompress and unpack a bzip2 compressed tar archive into a directory.
     If the directory is null, the current working directory is used instead.
     Returns 0 on success and anything else on failiure.
     If the library wasn't compiled with compression, it will always return -2 and do nothing.

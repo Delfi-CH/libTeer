@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <libgen.h>
 #include <string.h>
-
 
 void rand_str(char *dest, size_t length)
 {
@@ -63,6 +63,85 @@ void print_ustar_header_info(LibTeer_UStarHeader *header)
     printf("filename_prefix: %s\n", header->filename_prefix);
 }
 
-char *libTeer_get_version() {
-    return LIBTEER_VERSION_STRING;   
+char *libTeer_get_version()
+{
+    return LIBTEER_VERSION_STRING;
+}
+
+char *get_file_extension(const char *filename)
+{
+    char *tmpfname = strdup(filename);
+    char *basefile = basename(tmpfname);
+
+    char *token = strtok(basefile, ".");
+    char *lasttoken;
+    while (token != NULL)
+    {
+        lasttoken = token;
+        token = strtok(NULL, ".");
+        if (token == NULL)
+        {
+            return lasttoken;
+        }
+    }
+
+    return NULL;
+}
+
+libTeer_Compression_Mode get_mode_from_filename(const char *filename)
+{
+    char *ext = get_file_extension(filename);
+    if (strncmp(ext, "tar", 3) == 0)
+    {
+        return NOCOMPRESS;
+    }
+    else if (strncmp(ext, "gz", 2) == 0)
+    {
+        return GZIP;
+    }
+    else if (strncmp(ext, "gzip", 4) == 0)
+    {
+        return GZIP;
+    }
+    else if (strncmp(ext, "tgz", 3) == 0)
+    {
+        return GZIP;
+    }
+    else if (strncmp(ext, "xz", 2) == 0)
+    {
+        return XZ;
+    }
+    else if (strncmp(ext, "lzma", 4) == 0)
+    {
+        return XZ;
+    }
+    else if (strncmp(ext, "txz", 3) == 0)
+    {
+        return XZ;
+    }
+    else if (strncmp(ext, "lz", 2) == 0)
+    {
+        return XZ;
+    }
+    else if (strncmp(ext, "bz2", 3) == 0)
+    {
+        return BZIP2;
+    }
+    else if (strncmp(ext, "zst", 3) == 0)
+    {
+        return ZSTD;
+    }
+    else if (strncmp(ext, "zstd", 4) == 0)
+    {
+        return ZSTD;
+    } 
+    else if (strncmp(ext, "tstd", 3) == 0)
+    {
+        return ZSTD;
+    }
+    else
+    {
+        fprintf(stderr, "Failed to determine compression mode from file extension '%s'!\n", ext);
+        return -1;
+    }
 }
