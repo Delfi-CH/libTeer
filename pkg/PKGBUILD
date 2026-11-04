@@ -16,7 +16,7 @@ sha256sums=('SKIP')
 
 build() {
     cd "$pkgname"-"$pkgver"
-    make OUTPUT=shared CC=gcc VERSION="$pkgver" OPTFLAGS=-02
+    make OUTPUT=shared CC=gcc VERSION="$pkgver" OPTFLAGS=-O2
 }
 
 package() {

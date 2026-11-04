@@ -22,7 +22,7 @@ pkgver() {
 
 build() {
     cd "$pkgname"
-    make OUTPUT=shared CC=gcc OPTFLAGS=-02
+    make OUTPUT=shared CC=gcc OPTFLAGS=-O2
 }
 
 package() {
