@@ -37,6 +37,9 @@ ifeq ($(FEATURE_COMPRESSION), true)
 endif
 endif
 
+OPTFLAGS ?= -O0 -ggdb
+CFLAGS += $(OPTFLAGS)
+
 # Directories & Files
 
 SRCDIR=src

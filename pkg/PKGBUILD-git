@@ -6,7 +6,7 @@ arch=('x86_64')
 url="https://github.com/Delfi-CH/libTeer"
 license=('LGPL-2.1-only')
 depends=('glibc' 'zlib' 'xz' 'bzip2' 'zstd')
-makedepends=('git' 'gcc' 'make')
+makedepends=('git' 'gcc' 'make' 'coreutils')
 provides=('libTeer')
 conflicts=('libTeer')
 
@@ -22,7 +22,7 @@ pkgver() {
 
 build() {
     cd "$pkgname"
-    make OUTPUT=shared CC=gcc
+    make OUTPUT=shared CC=gcc OPTFLAGS=-02
 }
 
 package() {

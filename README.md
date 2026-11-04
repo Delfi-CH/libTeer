@@ -2,7 +2,7 @@
 
 library for handeling tarballs
 
-current version: v0.3.0
+current version: v0.3.1
 
 ## Installation
 
@@ -116,7 +116,8 @@ make
 
 ### Requirements
 
-- (GNU) Make
+- GNU Make
+- GNU coreutils
 - gcc/clang
 
 #### For compression: 
@@ -153,6 +154,9 @@ make VERSION=0.1.0
 
 make OUTPUT=static
 # creates a .a archive instead of a shared object for static linking. if FEATURE_COMPRESSION=true, it will also build static versions of the compression libraries in thirdparty/
+
+make OPTFLAGS=-O2
+# build the library with optimisations
 
 make CC=clang
 # builds the library with clang
