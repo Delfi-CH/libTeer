@@ -200,12 +200,16 @@ int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mo
     case NOCOMPRESS:
         break;
     case GZIP:
+        rc = libTeer_gzip_decompress(source, rand_filename_source);
         break;
     case XZ:
+        rc = libTeer_xz_decompress(source, rand_filename_source);
         break;
     case BZIP2:
+        rc = libTeer_bzip2_decompress(source, rand_filename_source);
         break;
     case ZSTD:
+        rc = libTeer_zstd_decompress(source, rand_filename_source);
         break;
     case AUTO_COMPRESSION:
         rc = -2;
@@ -222,12 +226,60 @@ int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mo
     case NOCOMPRESS:
         break;
     case GZIP:
+        rc = libTeer_gzip_decompress(target, rand_filename_target);
         break;
     case XZ:
+        rc = libTeer_xz_decompress(target, rand_filename_target);
         break;
     case BZIP2:
+        rc = libTeer_bzip2_decompress(target, rand_filename_target);
         break;
     case ZSTD:
+        rc = libTeer_zstd_decompress(target, rand_filename_target);
+        break;
+    case AUTO_COMPRESSION:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    case COMPRESSION_MODE_SIZE:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    }
+
+    if (rc != 0) {
+        return rc;
+    }
+
+    if (source_used_mode == NOCOMPRESS && target_used_mode == NOCOMPRESS) {
+        rc = libTeer_basic_merge(source, target);
+    } else if (source_used_mode != NOCOMPRESS && target_used_mode == NOCOMPRESS) {
+        rc = libTeer_basic_merge(rand_filename_source, target);   
+    } else if (source_used_mode == NOCOMPRESS && target_used_mode != NOCOMPRESS) {
+        rc = libTeer_basic_merge(source, rand_filename_target);
+    } else if (source_used_mode != NOCOMPRESS && target_used_mode != NOCOMPRESS) {
+        rc = libTeer_basic_merge(rand_filename_source, rand_filename_target);  
+    }
+
+    if (rc != 0) {
+        return rc;
+    }
+
+    switch (target_used_mode)
+    {
+    case NOCOMPRESS:
+        break;
+    case GZIP:
+        rc = libTeer_gzip_compress(rand_filename_target, target);
+        break;
+    case XZ:
+        rc = libTeer_xz_compress(rand_filename_target, target, LIBTEER_DEFAULT_XZ_COMPRESSION_LEVEL);
+        break;
+    case BZIP2:
+        rc = libTeer_bzip2_compress(rand_filename_target, target, LIBTEER_DEFAULT_BZIP2_COMPRESSION_LEVEL, LIBTEER_DEFAULT_BZIP2_WORK_FACTOR);
+        break;
+    case ZSTD:
+        rc = libTeer_zstd_compress(rand_filename_target, target, LIBTEER_DEFAULT_ZSTD_COMPRESSION_LEVEL);
         break;
     case AUTO_COMPRESSION:
         rc = -2;
