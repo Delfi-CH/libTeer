@@ -13,5 +13,6 @@ char *read_single_record(FILE *tarball);
 void print_ustar_header_info(LibTeer_UStarHeader *header);
 char *get_file_extension(const char *filename);
 libTeer_Compression_Mode get_mode_from_filename(const char *filename);
+void print_record(const char *record);
 
 #endif

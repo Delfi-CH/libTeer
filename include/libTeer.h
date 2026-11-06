@@ -88,7 +88,20 @@ typedef enum format
 char *libTeer_get_version();
 
 void libTeer_append();
-void libTeer_merge();
+
+/*
+    Merge the contents of source into target.
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mode source_compression_mode, libTeer_Compression_Mode target_compression_mode);
+
+/*
+    Merge the contents of source into target.
+    Returns 0 on success and anything else on failiure.
+*/
+int libTeer_basic_merge(const char *source, const char *target);
+
 void libTeer_create();
 
 /*

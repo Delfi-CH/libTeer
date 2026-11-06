@@ -145,3 +145,10 @@ libTeer_Compression_Mode get_mode_from_filename(const char *filename)
         return -1;
     }
 }
+
+void print_record(const char *record) {
+    for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++) {
+        printf("%c", record[i]);
+    }   
+    printf("\n");
+}

@@ -128,7 +128,7 @@ int libTeer_unpack(const char *filename, const char *directory, libTeer_Compress
     int rc = 0;
     libTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE);
+        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
         rc = 1;
         return rc;
     }
