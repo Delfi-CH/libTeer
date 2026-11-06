@@ -101,7 +101,6 @@ int libTeer_basic_merge(const char *source, const char *target) {
         return 1;
     }
 
-    printf("%s has %d headers, %d used\n", target, target_records_length, target_filled_headers);
     char (*new_records)[LIBTEER_RECORD_LENGTH] = realloc(target_records, (target_filled_headers + source_records_length) * LIBTEER_RECORD_LENGTH);
     if (new_records == NULL) {
         fprintf(stderr, "Could not allocate memory!\n");
