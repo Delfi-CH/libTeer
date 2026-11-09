@@ -87,7 +87,12 @@ typedef enum format
 */
 char *libTeer_get_version();
 
-void libTeer_append();
+/*
+    Append file to archive.
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+int libTeer_append(const char *archive, const char *file, libTeer_Compression_Mode compression_mode);
 
 /*
     Merge the contents of source into target.
