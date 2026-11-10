@@ -77,10 +77,14 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 struct stat path_st;
                 stat(path, &path_st);
                 if (S_ISDIR(path_st.st_mode)) {
+                    free(buf);
                     continue;
                 } else {
                     if(mkdir(path, strtol(header->file_mode, NULL, 8))) {
                         fprintf(stderr, "Failed to make directory %s!\n", path);
+                        free(initial_working_directory);
+                        free(buf);
+                        free(header);
                         return 1;
                     };
                 }
@@ -88,16 +92,25 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 if (current_file != NULL) {
                     if(fclose(current_file)) {
                         fprintf(stderr, "Failed to close file %s!\n", current_filename);
+                        free(initial_working_directory);
+                        free(buf);
+                        free(header);
                         return 1;
                     }
                 }
                 if (snprintf(current_filename, sizeof(char) * 255, "%s", path) < 0) {
                     fprintf(stderr, "Failed to write filename %s!\n", path);
-                        return 1;
+                    free(initial_working_directory);
+                    free(buf);
+                    free(header);
+                    return 1;
                 }  
                 current_file = fopen(current_filename, "w");
                 if (current_file == NULL) {
                     fprintf(stderr, "Failed to open file %s", current_filename);
+                    free(initial_working_directory);
+                    free(buf);
+                    free(header);
                     return 1;
                 }
             }
@@ -106,6 +119,9 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         {
             if (current_file == NULL) {
                 fprintf(stderr, "Attempted to write to a null pointer! Aborting...\n");
+                free(initial_working_directory);
+                free(buf);
+                free(header);
                 return 1;
             }
             for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++)
@@ -115,11 +131,11 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 }
             }
         }
+        free(buf);
     }
 
     chdir(initial_working_directory);
     free(initial_working_directory);
-    free(buf);
     free(header);
     return 0;
 }

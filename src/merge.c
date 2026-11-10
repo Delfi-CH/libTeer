@@ -65,7 +65,15 @@ int libTeer_basic_merge(const char *source, const char *target) {
     }
     int source_records_length = st1.st_size / LIBTEER_RECORD_LENGTH;
     for (int i = 0; i < source_records_length; i++) {
-        memcpy(source_records[i], read_single_record(sourcefile), LIBTEER_RECORD_LENGTH);
+        char *data = read_single_record(sourcefile);
+        if (data == NULL) {
+            free(source_records);
+            fclose(targetfile);
+            fprintf(stderr, "Could not allocate memory\n");
+            return 1;
+        }
+        memcpy(source_records[i], data, LIBTEER_RECORD_LENGTH);
+        free(data); 
     }
 
     if (fclose(sourcefile) != 0) {
@@ -84,7 +92,16 @@ int libTeer_basic_merge(const char *source, const char *target) {
     }
     int target_records_length = st2.st_size / LIBTEER_RECORD_LENGTH;
     for (int i = 0; i < target_records_length; i++) {
-        memcpy(target_records[i], read_single_record(targetfile), LIBTEER_RECORD_LENGTH);
+        char *data = read_single_record(targetfile);
+        if (data == NULL) {
+            free(source_records);
+            free(target_records);
+            fclose(targetfile);
+            fprintf(stderr, "Could not allocate memory\n");
+            return 1;
+        }
+        memcpy(target_records[i], data, LIBTEER_RECORD_LENGTH);
+        free(data); 
     }
 
     int target_filled_headers = 0;

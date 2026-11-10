@@ -16,7 +16,7 @@ MAKEFLAGS_BUNDLED_LIBRARIES = -j4
 
 CC = gcc
 AR = gcc-ar
-CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
+CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\" -fsanitize=address
 ifeq ($(CC), clang)
 ifeq ($(FEATURE_MSAN), true)
 ifeq ($(FEATURE_COMPRESSION), false)

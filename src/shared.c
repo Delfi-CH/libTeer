@@ -79,10 +79,9 @@ char *libTeer_get_version()
     return LIBTEER_VERSION_STRING;
 }
 
-char *get_file_extension(const char *filename)
+char *get_file_extension(char *filename)
 {
-    char *tmpfname = strdup(filename);
-    char *basefile = basename(tmpfname);
+    char *basefile = basename(filename);
 
     char *token = strtok(basefile, ".");
     char *lasttoken;
@@ -95,66 +94,70 @@ char *get_file_extension(const char *filename)
             return lasttoken;
         }
     }
-
     return NULL;
 }
 
 libTeer_Compression_Mode get_mode_from_filename(const char *filename)
 {
-    char *ext = get_file_extension(filename);
+    char *dupfnmape = strdup(filename);
+    libTeer_Compression_Mode return_mode;
+    char *ext = get_file_extension(dupfnmape);
     if (strncmp(ext, "tar", 3) == 0)
     {
-        return NOCOMPRESS;
+        return_mode = NOCOMPRESS;
     }
     else if (strncmp(ext, "gz", 2) == 0)
     {
-        return GZIP;
+        return_mode = GZIP;
     }
     else if (strncmp(ext, "gzip", 4) == 0)
     {
-        return GZIP;
+        return_mode = GZIP;
     }
     else if (strncmp(ext, "tgz", 3) == 0)
     {
-        return GZIP;
+        return_mode = GZIP;
     }
     else if (strncmp(ext, "xz", 2) == 0)
     {
-        return XZ;
+        return_mode = XZ;
     }
     else if (strncmp(ext, "lzma", 4) == 0)
     {
-        return XZ;
+        return_mode = XZ;
     }
     else if (strncmp(ext, "txz", 3) == 0)
     {
-        return XZ;
+        return_mode = XZ;
     }
     else if (strncmp(ext, "lz", 2) == 0)
     {
-        return XZ;
+        return_mode = XZ;
     }
     else if (strncmp(ext, "bz2", 3) == 0)
     {
-        return BZIP2;
+        return_mode = BZIP2;
     }
     else if (strncmp(ext, "zst", 3) == 0)
     {
-        return ZSTD;
+        return_mode = ZSTD;
     }
     else if (strncmp(ext, "zstd", 4) == 0)
     {
-        return ZSTD;
+        return_mode = ZSTD;
     }
     else if (strncmp(ext, "tstd", 3) == 0)
     {
-        return ZSTD;
+        return_mode = ZSTD;
     }
     else
     {
         fprintf(stderr, "Failed to determine compression mode from file extension '%s'!\n", ext);
+        free(dupfnmape);
         return -1;
     }
+    free(dupfnmape);
+    return return_mode;
 }
 
 void print_record(const char *record)
@@ -177,15 +180,26 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     {
         return NULL;
     }
-    struct stat st;
     LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
+    if (header == NULL) {
+        fprintf(stderr, "Failed to allocate memory!\n");
+        return NULL;
+    }
+    struct stat st;
     if (stat(filename, &st))
     {
         fprintf(stderr, "Failed to stat file %s!\n", filename);
+        free(header);
         return NULL;
     }
     struct ustar_filebuf *filebuf = malloc(sizeof(struct ustar_filebuf));
-    memcpy(header->file_path, filename, 100);
+    if (filebuf == NULL) {
+        fprintf(stderr, "Failed to allocate memory!\n");
+        free(header);
+        return NULL;
+    }
+
+    snprintf(header->file_path, 100, "%s", filename);
     snprintf(header->file_mode, 8, "%07o", st.st_mode);
     snprintf(header->owner_id, 8, "%07o", st.st_uid);
     snprintf(header->group_id, 8, "%07o", st.st_gid);
@@ -216,7 +230,6 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
             record_count = st.st_size / 512 + 1;
         }
         LibTeer_Record *records = calloc(record_count, sizeof(LibTeer_Record));
-
         if (records == NULL)
         {
             free(filebuf);
@@ -228,6 +241,9 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         if (file == NULL)
         {
             fprintf(stderr, "Failed to open file %s!\n", filename);
+            free(filebuf);
+            free(header);
+            free(records);
             return NULL;
         }
 
@@ -250,6 +266,6 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         filebuf->records = NULL;
         filebuf->record_count = 0;
     }
-    filebuf->header = *header;
+    filebuf->header = header;
     return filebuf;
 }

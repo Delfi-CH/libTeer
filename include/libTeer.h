@@ -92,7 +92,13 @@ char *libTeer_get_version();
     If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
     Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
 */
-int libTeer_append(const char *archive, const char *file, libTeer_Compression_Mode compression_mode);
+int libTeer_append(const char *archive_name, const char *filename, libTeer_Compression_Mode compression_mode);
+
+/*
+    Append file to archive.
+    Returns 0 on success and anything else on failiure.
+*/
+int libTeer_basic_append(const char *archive_name, const char *filename);
 
 /*
     Merge the contents of source into target.
