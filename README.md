@@ -140,7 +140,7 @@ make FEATURE_COMPRESSION=false
 
 make install
 # installs the .so or .a into /usr/lib and the nessecary headers into /usr/include/libTeer, requieres root permissions
-# on fedora linux use it like
+# on fedora linux the libdir is /usr/lib64, see example below
 # make install PREFIX=/usr LIBDIR=lib64
 
 make test

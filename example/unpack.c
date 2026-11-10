@@ -1,4 +1,4 @@
-#include <libTeer/tar.h>
+#include <libTeer.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     }
 
     printf("unpacking %s to %s\n", tarfile, output_directory);
-    libTeer_unpack(tarfile, output_directory);
+    libTeer_unpack(tarfile, output_directory, AUTO_COMPRESSION);
     printf("done\n");
     return 0;
 }
