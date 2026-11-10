@@ -200,7 +200,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     }
 
     snprintf(header->file_path, 100, "%s", filename);
-    snprintf(header->file_mode, 8, "%07o", st.st_mode);
+    snprintf(header->file_mode, 8, "%07o", st.st_mode & 07777);
     snprintf(header->owner_id, 8, "%07o", st.st_uid);
     snprintf(header->group_id, 8, "%07o", st.st_gid);
     snprintf(header->file_size, 12, "%011o", (unsigned int)st.st_size);
@@ -217,6 +217,17 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     memcpy(header->device_minor_number, ZERO_8, 8);
     memcpy(header->filename_prefix, ZERO_155, 155);
     memcpy(header->padding, ZERO_12, 12);
+
+    unsigned int checksum = 0;
+    memset(header->checksum, ' ', sizeof(header->checksum));
+    const unsigned char *bytes = (const unsigned char *)header;
+    for (int i = 0; i < sizeof(*header); i++)
+    {
+        checksum += bytes[i];
+    }
+    snprintf(header->checksum, sizeof(header->checksum),"%06o", checksum);
+    header->checksum[6] = '\0';
+    header->checksum[7] = ' ';
 
     if (S_ISREG(st.st_mode))
     {
@@ -268,4 +279,15 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     }
     filebuf->header = header;
     return filebuf;
+}
+
+char *ustar_header_to_data(LibTeer_UStarHeader *header)
+{
+    if (header == NULL)
+        return NULL;
+    char *data = malloc(sizeof(LibTeer_UStarHeader));
+    if (data == NULL)
+        return NULL;
+    memcpy(data, header, sizeof(LibTeer_UStarHeader));
+    return data;
 }

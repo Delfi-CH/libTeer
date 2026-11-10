@@ -38,7 +38,7 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 
 - [ ] Creating archives
 - [x] Unpacking archives
-- [ ] Appending to archives
+- [x] Appending to archives
 - [x] Merging archives
 
 **(De)Compression:**

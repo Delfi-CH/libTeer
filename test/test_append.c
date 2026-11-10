@@ -2,7 +2,8 @@
 #include <stdio.h>
 
 int main() {
-    printf("appending LICENSE to src.tar\n");
-    libTeer_basic_append("src.tar", "LICENSE");
+    printf("appending LICENSE to src2.tar\n");
+    libTeer_append("src2.tar", "LICENSE", AUTO_COMPRESSION);
+    printf("done\n");
     return 0;
 }

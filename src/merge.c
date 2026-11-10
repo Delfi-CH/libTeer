@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-const char zero_record[LIBTEER_RECORD_LENGTH] = {0}; 
+static const char zero_record[LIBTEER_RECORD_LENGTH] = {0}; 
 
 int libTeer_basic_merge(const char *source, const char *target) {
     if (source == NULL) {

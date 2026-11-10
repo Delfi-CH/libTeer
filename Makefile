@@ -217,6 +217,7 @@ clean:
 test: all $(TEST_SRC)
 	tar cf $(DEMOTAR) $(FOODIR)
 	tar cf $(SRCDIR).tar $(SRCDIR)
+	tar cf $(SRCDIR)2.tar $(SRCDIR)
 	tar czf $(DEMOTAR).gz $(FOODIR)
 	tar --zstd --create --file $(DEMOTAR).zstd $(FOODIR)
 	tar cjf $(DEMOTAR).bz2 $(FOODIR)

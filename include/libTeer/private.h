@@ -25,5 +25,6 @@ char *get_file_extension(char *filename);
 libTeer_Compression_Mode get_mode_from_filename(const char *filename);
 void print_record(const char *record);
 struct ustar_filebuf *file_to_ustar_buffer(const char *filename);
+char *ustar_header_to_data(LibTeer_UStarHeader *header);
 
 #endif
