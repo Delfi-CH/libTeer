@@ -141,36 +141,4 @@ int libTeer_unpack(const char *filename, const char *directory, libTeer_Compress
 */
 int libTeer_basic_unpack(const char *filename, const char *directory);
 
-/*
-    Decompress and unpack a gzip compressed tar archive into a directory.
-    If the directory is null, the current working directory is used instead.
-    Returns 0 on success and anything else on failiure.
-    If the library wasn't compiled with compression, it will always return -2 and do nothing.
-*/
-int libTeer_gzip_unpack(const char *filename, const char *directory);
-
-/*
-    Decompress and unpack an xz/lzma compressed tar archive into a directory.
-    If the directory is null, the current working directory is used instead.
-    Returns 0 on success and anything else on failiure.
-    If the library wasn't compiled with compression, it will always return -2 and do nothing.
-*/
-int libTeer_xz_unpack(const char *filename, const char *directory);
-
-/*
-    Decompress and unpack a zstd compressed tar archive into a directory.
-    If the directory is null, the current working directory is used instead.
-    Returns 0 on success and anything else on failiure.
-    If the library wasn't compiled with compression, it will always return -2 and do nothing.
-*/
-int libTeer_zstd_unpack(const char *filename, const char *directory);
-
-/*
-    Decompress and unpack a bzip2 compressed tar archive into a directory.
-    If the directory is null, the current working directory is used instead.
-    Returns 0 on success and anything else on failiure.
-    If the library wasn't compiled with compression, it will always return -2 and do nothing.
-*/
-int libTeer_bzip2_unpack(const char *filename, const char *directory);
-
 #endif

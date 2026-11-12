@@ -1,5 +1,6 @@
 #include "../include/libTeer.h"
 #include "../include/libTeer/private.h"
+#include "../include/libTeer/compress.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
