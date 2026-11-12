@@ -1,6 +1,6 @@
 # libTeer
 
-library for handeling tarballs
+library for working with ustar archives
 
 current version: v0.8.0
 
@@ -27,13 +27,6 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 
 ## Features:
 
-**Tar formats:**
-
-- [ ] unix v7 tar support
-- [x] ustar support
-- [ ] GNU tar support
-- [ ] pax support
-
 **Operations:**
 
 - [x] Creating archives
@@ -47,7 +40,6 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 - [x] xz/lzma
 - [x] bz2
 - [x] zstd
-
 
 ## Usage
 
