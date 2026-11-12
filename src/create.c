@@ -39,6 +39,7 @@ int libTeer_basic_create(const char *directory, const char *output)
         if (fbuf == NULL)
         {
             fprintf(stderr, "Failed to convert %s into a buffer!\n", list->data[i]);
+            free_directory_list(list);
             return 1;
         }
 

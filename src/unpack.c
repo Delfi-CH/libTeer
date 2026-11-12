@@ -67,10 +67,12 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         if (is_record_ustar_header(buf))
         {   
             memcpy(header, buf, sizeof(*header));
-            char path[sizeof(header->file_path) + 1];
-            memcpy(path, header->file_path, sizeof(header->file_path));
-            path[sizeof(header->file_path)] = '\0';
-            //print_header_info(header);
+            char path[257];
+            if (header->filename_prefix[0] != '\0') {
+                snprintf(path, sizeof(path), "%s/%s",header->filename_prefix, header->file_path);
+            } else {
+                snprintf(path, sizeof(path), "%s", header->file_path);
+            }
 
             // is it a directory?
             if (path[strlen(header->file_path) - 1] == '/')

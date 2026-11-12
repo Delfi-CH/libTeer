@@ -8,6 +8,27 @@
 
 static int list_count = 0;
 
+char *add_trailing_slash(const char *directory)
+{
+    if (directory == NULL)
+        return NULL;
+
+    size_t len = strlen(directory);
+
+    char *result = malloc(len + 2);
+    if (result == NULL)
+        return NULL;
+
+    strcpy(result, directory);
+
+    if (len > 0 && directory[len - 1] != '/') {
+        result[len] = '/';
+        result[len + 1] = '\0';
+    }
+
+    return result;
+}
+
 char **get_directory_list_recursive(const char *directory, char **list)
 {
     if (directory == NULL)
@@ -34,13 +55,18 @@ char **get_directory_list_recursive(const char *directory, char **list)
         if (path == NULL)
             continue;
 
-        snprintf(path, len, "%s/%s", directory, ep->d_name);
+        snprintf(path, len, "%s%s", directory, ep->d_name);
 
         struct stat st;
 
         if (lstat(path, &st) == -1) {
             free(path);
             continue;
+        }
+
+        if (S_ISDIR(st.st_mode)) {
+            path = realloc(path, len + 1);
+            snprintf(path, len + 1, "%s%s/", directory, ep->d_name);
         }
 
         char **tmp = realloc(
@@ -76,11 +102,11 @@ char **get_directory_list_recursive(const char *directory, char **list)
 
 struct filellist *get_directory_list(const char *directory)
 {
-    char *realdir = malloc(sizeof(char) * 200);
-    if (strlen(directory)-1 != '/') {
-        snprintf(realdir, 200, "%s/", directory);
+    char *realdir = malloc(sizeof(char) * 256);
+    if (directory[strlen(directory) -1] != '/') {
+        snprintf(realdir, 256, "%s/", directory);
     } else {
-        snprintf(realdir, 200, "%s", directory);
+        snprintf(realdir, 256, "%s", directory);
     }
     struct filellist *list = malloc(sizeof(struct filellist));
     if (list == NULL)
@@ -89,6 +115,9 @@ struct filellist *get_directory_list(const char *directory)
     list_count = 1;
 
     char **list_data = malloc(sizeof(char *));
+    if (list_data == NULL)
+        return NULL;
+    
     list_data[0] = strdup(realdir);
 
     list_data = get_directory_list_recursive(realdir, list_data);

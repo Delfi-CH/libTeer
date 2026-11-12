@@ -41,9 +41,9 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 - [x] bz2
 - [x] zstd
 
-## Known issues
+## Known issues / Limitations
 
-- Filenames can only be 100 characters long, because the ustar prefix header field is never used.
+- Paths can only be 255 characters long. This is a limitation of the ustar format
 - No explicit support for GNU TAR (old and new), original UNIX V7 and PAX archive formats.
 
 ## Usage

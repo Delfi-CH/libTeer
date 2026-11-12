@@ -199,7 +199,35 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         return NULL;
     }
 
-    snprintf(header->file_path, 100, "%s", filename);
+    if (strlen(filename) < 100) {
+        snprintf(header->file_path, 100, "%s", filename);
+        memcpy(header->filename_prefix, ZERO_155, 155);
+    } else if (strlen(filename) < 256) {
+        char *dupfilename = strdup(filename);
+        char prefix_buf[156];
+        snprintf(prefix_buf, 156, "%s", filename);
+        char *prefix_end = strdup(strrchr(prefix_buf, '/'));
+        prefix_buf[strlen(prefix_buf) - strlen(prefix_end)] = '\0';
+        size_t prefix_len = strlen(prefix_buf);
+        memmove(dupfilename, dupfilename + prefix_len + 1, strlen(dupfilename) - prefix_len);
+        if (strlen(dupfilename) > 99) {
+            fprintf(stderr, "Filename %s cannot be split!\n", filename);
+            free(dupfilename);
+            free(prefix_end);
+            free(filebuf);
+            free(header);
+            return NULL;
+        }
+        snprintf(header->file_path, strlen(dupfilename) + 1, "%s", dupfilename);
+        snprintf(header->filename_prefix, strlen(prefix_buf) + 1, "%s", prefix_buf);
+        free(dupfilename);
+        free(prefix_end);
+    } else {
+        fprintf(stderr, "Filename %s is longer than 255 characters!\n", filename);
+        free(header);
+        free(filebuf);
+        return NULL;
+    }
     snprintf(header->file_mode, 8, "%07o", st.st_mode & 07777);
     snprintf(header->owner_id, 8, "%07o", st.st_uid);
     snprintf(header->group_id, 8, "%07o", st.st_gid);
@@ -215,7 +243,6 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     snprintf(header->groupname, 32, "%s", g->gr_name);
     memcpy(header->device_major_number, ZERO_8, 8);
     memcpy(header->device_minor_number, ZERO_8, 8);
-    memcpy(header->filename_prefix, ZERO_155, 155);
     memcpy(header->padding, ZERO_12, 12);
 
     unsigned int checksum = 0;
