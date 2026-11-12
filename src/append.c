@@ -40,6 +40,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
         free(fbuf);
         return 1;
     }
+
     if (st.st_size % LIBTEER_RECORD_LENGTH)
     {
         fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", archive_name, LIBTEER_RECORD_LENGTH);
@@ -78,6 +79,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
         free(fbuf);
         return 1;
     }
+    
     int target_records_length = st.st_size / LIBTEER_RECORD_LENGTH;
     for (int i = 0; i < target_records_length; i++)
     {

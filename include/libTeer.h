@@ -113,7 +113,18 @@ int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mo
 */
 int libTeer_basic_merge(const char *source, const char *target);
 
-void libTeer_create();
+/*
+    Create an archive from a directory.
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the output name.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+int libTeer_create(const char *directory, const char *output, libTeer_Compression_Mode compression_mode);
+
+/*
+    Create an archive from a directory.
+    Returns 0 on success and anything else on failiure.
+*/
+int libTeer_basic_create(const char *directory, const char *output);
 
 /*
     Unpack a tar archive into a directory.

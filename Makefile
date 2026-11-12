@@ -67,8 +67,8 @@ ifeq ($(FEATURE_COMPRESSION), true)
 endif
 
 
-CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c
-CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o
+CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c $(SRCDIR)/dirtraverse.c
+CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o $(BUILDDIR)/dirtraverse.o
 
 COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/compress/xz.c $(SRCDIR)/compress/zstd.c
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
@@ -94,6 +94,9 @@ TEST_MERGE_OBJ=test_merge
 
 TEST_APPEND_SRC=$(TESTDIR)/test_append.c 
 TEST_APPEND_OBJ=test_append
+
+TEST_CREATE_SRC=$(TESTDIR)/test_create.c 
+TEST_CREATE_OBJ=test_create
 
 TEST_VERSION_SRC=$(TESTDIR)/test_version.c 
 TEST_VERSION_OBJ=test_version
@@ -210,7 +213,7 @@ $(ZSTD_ARCHIVE):
 .PHONY: clean
 
 clean:
-	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_MERGE_OBJ) $(TEST_APPEND_OBJ) $(TEST_VERSION_OBJ) *.tar*
+	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_MERGE_OBJ) $(TEST_APPEND_OBJ) $(TEST_CREATE_OBJ) $(TEST_VERSION_OBJ) *.tar*
 
 .PHONY: test
 
@@ -226,6 +229,7 @@ ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ)
 	$(CC) $(TEST_MERGE_SRC) $(PRODUCT) -o $(TEST_MERGE_OBJ)
 	$(CC) $(TEST_APPEND_SRC) $(PRODUCT) -o $(TEST_APPEND_OBJ)
+	$(CC) $(TEST_CREATE_SRC) $(PRODUCT) -o $(TEST_CREATE_OBJ)
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ)
 else
 	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ)
@@ -234,6 +238,8 @@ else
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_MERGE_OBJ)
 	$(CC) $(CFLAGS) $(TEST_APPEND_SRC) -L$(PWD) -lTeer -o $(TEST_APPEND_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_APPEND_OBJ)
+	$(CC) $(CFLAGS) $(TEST_CREATE_SRC) -L$(PWD) -lTeer -o $(TEST_CREATE_OBJ)
+	LD_LIBRARY_PATH=$(PWD) ./$(TEST_CREATE_OBJ)
 	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_VERSION_OBJ)
 endif
