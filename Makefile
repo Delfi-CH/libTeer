@@ -1,6 +1,7 @@
 # Feature flags
 
 FEATURE_COMPRESSION = true
+FEATURE_ASAN = true
 FEATURE_MSAN = false
 PKGTYPE = release
 
@@ -16,12 +17,18 @@ MAKEFLAGS_BUNDLED_LIBRARIES = -j4
 
 CC = gcc
 AR = gcc-ar
-CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\" -fsanitize=address
+CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
 ifeq ($(CC), clang)
 ifeq ($(FEATURE_MSAN), true)
 ifeq ($(FEATURE_COMPRESSION), false)
 	CFLAGS += -fsanitize=memory
 endif
+endif
+endif
+
+ifeq ($(CC), gcc)
+ifeq ($(FEATURE_ASAN), true)
+	CFLAGS += -fsanitize=address
 endif
 endif
 
