@@ -1,5 +1,5 @@
 pkgname=libTeer
-pkgver=0.3.1
+pkgver=0.8.0
 pkgrel=1
 pkgdesc="Library for handleing tarballs"
 arch=('x86_64')

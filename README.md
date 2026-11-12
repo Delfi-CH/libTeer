@@ -2,7 +2,7 @@
 
 library for handeling tarballs
 
-current version: v0.3.1
+current version: v0.8.0
 
 ## Installation
 
