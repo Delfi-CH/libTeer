@@ -4,6 +4,10 @@ library for working with ustar archives
 
 current version: v0.8.1
 
+**Note:**
+
+This library is a hobby project and not intended for use in serious projects.
+
 ## Installation
 
 **Arch Linux:**
