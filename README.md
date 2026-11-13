@@ -2,7 +2,7 @@
 
 library for working with ustar archives
 
-current version: v0.8.1
+current version: v0.8.2
 
 **Note:**
 
