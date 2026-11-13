@@ -19,22 +19,28 @@ CC = gcc
 AR = gcc-ar
 CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
 ifeq ($(CC), clang)
+ifeq ($(OUTPUT), shared)
 ifeq ($(FEATURE_MSAN), true)
 ifeq ($(FEATURE_COMPRESSION), false)
 	CFLAGS += -fsanitize=memory
 endif
 endif
 endif
+endif
 
 ifeq ($(CC), gcc)
+ifeq ($(OUTPUT), shared)
 ifeq ($(FEATURE_ASAN), true)
 	CFLAGS += -fsanitize=address
+endif
 endif
 endif
 
 OUTPUT = shared
 ifeq ($(OUTPUT), shared)
 	CFLAGS += -fPIC
+else
+	CFLAGS += -static
 endif
 
 LDFLAGS =
@@ -148,7 +154,7 @@ $(PRODUCT): $(OBJ)
 else 
 ifeq ($(FEATURE_COMPRESSION), true)
 $(PRODUCT): $(THIRDPARTY_DIR) $(OBJ) $(COMPRESS_EXTERNAL_OBJ)
-	$(AR) rcs $(PRODUCT) $(OBJ)
+	$(AR) rcs $(PRODUCT) $(OBJ) $(THIRDPARTY_DIR)/libbz2/*.o $(THIRDPARTY_DIR)/libz/*.o $(THIRDPARTY_DIR)/liblzma/*.o $(THIRDPARTY_DIR)/libzstd/*.o
 else
 $(PRODUCT): $(OBJ)
 	$(AR) rcs $(PRODUCT) $(OBJ)
@@ -167,11 +173,23 @@ $(CORE_OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/%.c $(HEADERS)
 $(COMPRESS_OBJ): $(BUILDDIR)/%.o: $(SRCDIR)/compress/%.c $(HEADERS)
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(COMPRESS_EXTERNAL_OBJ): build-libraries
+$(COMPRESS_EXTERNAL_OBJ) &: build-libraries
 	cp $(BZIP2_OBJ) $(THIRDPARTY_DIR)/
+	mkdir -p $(THIRDPARTY_DIR)/libbz2
+	ar x --output=$(THIRDPARTY_DIR)/libbz2 $(BZIP2_OBJ)
+	cd $(THIRDPARTY_DIR)/libbz2 && for f in *.o; do mv -- "$$f" "libbz2_$$f"; done
 	cp $(ZLIB_OBJ) $(THIRDPARTY_DIR)/
+	mkdir -p $(THIRDPARTY_DIR)/libz
+	ar x --output=$(THIRDPARTY_DIR)/libz $(ZLIB_OBJ)
+	cd $(THIRDPARTY_DIR)/libz && for f in *.o; do mv -- "$$f" "libz_$$f"; done
 	cp $(LZMA_OBJ) $(THIRDPARTY_DIR)/
+	mkdir -p $(THIRDPARTY_DIR)/liblzma
+	ar x --output=$(THIRDPARTY_DIR)/liblzma $(LZMA_OBJ)
+	cd $(THIRDPARTY_DIR)/liblzma && for f in *.o; do mv -- "$$f" "liblzma_$$f"; done
 	cp $(ZSTD_OBJ) $(THIRDPARTY_DIR)/
+	mkdir -p $(THIRDPARTY_DIR)/libzstd
+	ar x --output=$(THIRDPARTY_DIR)/libzstd $(ZSTD_OBJ)
+	cd $(THIRDPARTY_DIR)/libzstd && for f in *.o; do mv -- "$$f" "libzstd_$$f"; done
 
 .PHONY: build-libraries
 
