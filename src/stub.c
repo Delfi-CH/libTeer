@@ -27,20 +27,20 @@ int libTeer_gzip_compress(const char *infile, const char *outfile) {
 int libTeer_xz_decompress(const char *infile, const char *outfile) {
     return -2;
 }
-int libTeer_xz_compress(const char *infile, const char *outfile) {
+int libTeer_xz_compress(const char *infile, const char *outfile, int compression_level) {
     return -2;
 }
 
 int libTeer_zstd_decompress(const char *infile, const char *outfile) {
     return -2;
 }
-int libTeer_zstd_compress(const char *infile, const char *outfile) {
+int libTeer_zstd_compress(const char *infile, const char *outfile, int compression_level) {
     return -2;
 }
 
 int libTeer_bzip2_decompress(const char *infile, const char *outfile) {
     return -2;
 }
-int libTeer_bzip2_compress(const char *infile, const char *outfile) {
+int libTeer_bzip2_compress(const char *infile, const char *outfile, int compression_level, int work_factor) {
     return -2;
 }
