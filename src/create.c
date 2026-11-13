@@ -184,5 +184,5 @@ int libTeer_create(const char *directory, const char *output, libTeer_Compressio
         break;
     }
 
-    return 0;
+    return rc;
 }
