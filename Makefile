@@ -143,10 +143,10 @@ ZSTD_URL = https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.
 all: $(BUILDDIR) $(PRODUCT)
 
 $(BUILDDIR):
-	mkdir --parents $(BUILDDIR)
+	mkdir -p $(BUILDDIR)
 
 $(THIRDPARTY_DIR):
-	mkdir --parents $(THIRDPARTY_DIR)
+	mkdir -p $(THIRDPARTY_DIR)
 
 ifeq ($(OUTPUT), shared)
 $(PRODUCT): $(OBJ)
@@ -238,7 +238,7 @@ $(ZSTD_ARCHIVE):
 .PHONY: clean
 
 clean:
-	rm --recursive --force $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_MERGE_OBJ) $(TEST_APPEND_OBJ) $(TEST_CREATE_OBJ) $(TEST_VERSION_OBJ) *.tar*
+	rm -rf $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_MERGE_OBJ) $(TEST_APPEND_OBJ) $(TEST_CREATE_OBJ) $(TEST_VERSION_OBJ) *.tar*
 
 .PHONY: test
 
