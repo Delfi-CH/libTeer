@@ -4,6 +4,7 @@ FEATURE_COMPRESSION = true
 FEATURE_ASAN = true
 FEATURE_MSAN = false
 PKGTYPE = release
+PLATFORM = linux
 
 VERSION ?= $(shell git rev-parse HEAD)
 
@@ -17,6 +18,15 @@ MAKEFLAGS_BUNDLED_LIBRARIES = -j4
 
 CC = gcc
 AR = gcc-ar
+
+
+ifeq ($(PLATFORM), windows)
+	CC = x86_64-w64-mingw32-gcc
+	AR = x86_64-w64-mingw32-ar
+	# temporarly disalbe compression on windows	
+	FEATURE_COMPRESSION = false 
+endif
+
 CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
 ifeq ($(CC), clang)
 ifeq ($(OUTPUT), shared)
@@ -45,8 +55,12 @@ endif
 
 LDFLAGS =
 ifeq ($(OUTPUT), shared)
+ifeq ($(PLATFORM), linux)
 ifeq ($(FEATURE_COMPRESSION), true)
 	LDFLAGS = -lz -lzstd -llzma -lbz2
+endif
+else
+	LDFLAGS = -ladvapi32
 endif
 endif
 
@@ -68,7 +82,11 @@ FOODIR=foo
 DEMOTAR=$(FOODIR).tar
 
 ifeq ($(OUTPUT), shared)
+ifeq ($(PLATFORM), windows)
+	PRODUCT=$(NAME).dll
+else
 	PRODUCT=$(NAME).so
+endif
 else
 	PRODUCT=$(NAME).a
 endif
@@ -238,7 +256,7 @@ $(ZSTD_ARCHIVE):
 .PHONY: clean
 
 clean:
-	rm -rf $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.a *.o *.so $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_MERGE_OBJ) $(TEST_APPEND_OBJ) $(TEST_CREATE_OBJ) $(TEST_VERSION_OBJ) *.tar*
+	rm -rf $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.exe *.a *.o *.so *.dll $(THIRDPARTY_DIR) $(TEST_UNPACK_OBJ) $(TEST_MERGE_OBJ) $(TEST_APPEND_OBJ) $(TEST_CREATE_OBJ) $(TEST_VERSION_OBJ) *.tar*
 
 .PHONY: test
 
@@ -250,12 +268,42 @@ test: all $(TEST_SRC)
 	tar --zstd --create --file $(DEMOTAR).zstd $(FOODIR)
 	tar cjf $(DEMOTAR).bz2 $(FOODIR)
 	tar cJf $(DEMOTAR).xz $(FOODIR)
+ifeq ($(PLATFORM), windows)
+ifeq ($(OUTPUT), static)
+	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ).exe
+	wine $(TEST_UNPACK_OBJ).exe
+	$(CC) $(TEST_MERGE_SRC) $(PRODUCT) -o $(TEST_MERGE_OBJ).exe
+	wine $(TEST_MERGE_OBJ).exe
+	$(CC) $(TEST_APPEND_SRC) $(PRODUCT) -o $(TEST_APPEND_OBJ).exe
+	wine $(TEST_APPEND_OBJ).exe
+	$(CC) $(TEST_CREATE_SRC) $(PRODUCT) -o $(TEST_CREATE_OBJ).exe
+	wine $(TEST_CREATE_OBJ).exe
+	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ).exe
+	wine $(TEST_VERSION_OBJ).exe
+else
+	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ).exe
+	wine $(TEST_UNPACK_OBJ).exe
+	$(CC) $(CFLAGS) $(TEST_MERGE_SRC) -L$(PWD) -lTeer -o $(TEST_MERGE_OBJ).exe
+	wine $(TEST_MERGE_OBJ).exe
+	$(CC) $(CFLAGS) $(TEST_APPEND_SRC) -L$(PWD) -lTeer -o $(TEST_APPEND_OBJ).exe
+	wine $(TEST_APPEND_OBJ).exe
+	$(CC) $(CFLAGS) $(TEST_CREATE_SRC) -L$(PWD) -lTeer -o $(TEST_CREATE_OBJ).exe
+	wine $(TEST_CREATE_OBJ).exe
+	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ).exe
+	wine $(TEST_VERSION_OBJ).exe
+endif
+else
 ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ)
+	./$(TEST_UNPACK_OBJ)
 	$(CC) $(TEST_MERGE_SRC) $(PRODUCT) -o $(TEST_MERGE_OBJ)
+	./$(TEST_MERGE_OBJ)
 	$(CC) $(TEST_APPEND_SRC) $(PRODUCT) -o $(TEST_APPEND_OBJ)
+	./$(TEST_APPEND_OBJ)
 	$(CC) $(TEST_CREATE_SRC) $(PRODUCT) -o $(TEST_CREATE_OBJ)
+	./$(TEST_CREATE_OBJ)
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ)
+	./$(TEST_VERSION_OBJ)
 else
 	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_OBJ)
@@ -268,11 +316,13 @@ else
 	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_VERSION_OBJ)
 endif
+endif
 
 PREFIX ?= /usr
 LIBDIR = $(PREFIX)/lib
 SYS_INCLUDEDIR = $(PREFIX)/include
 
+ifneq ($(PLATFORM), windows)
 .PHONY: install
 
 install: all
@@ -292,3 +342,4 @@ ifeq ($(PKGTYPE), git)
 	cp $(PKGFILESDIR)/PKGBUILD-git /tmp/PKGBUILD
 endif
 	cd /tmp && makepkg -si
+endif

@@ -6,6 +6,8 @@ zlib-*
 zstd-*
 build
 *.so
+*.dll
+*.exe
 *.a
 *.o
 test_*

@@ -47,7 +47,8 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 
 ## Known issues / Limitations
 
-- Paths can only be 255 characters long. This is a limitation of the ustar format
+- Windows builds cannot use compression.
+- Paths can only be 255 characters long. This is a limitation of the ustar format.
 - No explicit support for GNU TAR (old and new), original UNIX V7 and PAX archive formats.
 
 ## Usage
@@ -79,7 +80,9 @@ int main(int argc, char **argv) {
 
 ## Building
 
-### Quickstart
+### Linux
+
+#### Quickstart
 
 1. Install the required packages
 
@@ -115,25 +118,25 @@ cd libTeer
 make
 ```
 
-### Requirements
+#### Requirements
 
 - GNU Make
 - GNU coreutils
 - gcc/clang
 
-#### For compression: 
+**For compression:** 
 
 - zlib-dev
 - liblzma-dev
 - libbz2-dev
 - libzstd-dev
 
-#### For building compression with static library:
+**For building a static library with compression:**
 
 - wget
 - GNU autotools
 
-### Build options
+#### Build options
 
 ```bash
 make FEATURE_COMPRESSION=false
@@ -170,4 +173,36 @@ make archlinux-install
 
 make PKGTYPE=git archlinux-install 
 # build and install an Arch Linux PKGBUILD, made from the latest git commit 
+```
+
+### Windows (mingw)
+
+#### Requirements
+
+- GNU Make
+- GNU coreutils
+- mingw
+
+#### Building the project
+
+```bash
+git clone https://github.com/Delfi-CH/libTeer.git
+cd libTeer
+make PLATFORM=windows
+```
+
+#### Build options
+
+```bash
+make PLATFORM=windows test
+# build and run the test programs
+
+make clean
+# removes all artifacts from the directories
+
+make VERSION=0.1.0
+# use a specific version string instead of the latest commit
+
+make OUTPUT=static
+# creates a .a archive instead of a shared object for static linking.
 ```

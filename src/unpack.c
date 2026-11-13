@@ -83,6 +83,15 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                     free(buf);
                     continue;
                 } else {
+                    #ifdef _WIN32
+                    if(mkdir(path)) {
+                        fprintf(stderr, "Failed to make directory %s!\n", path);
+                        free(initial_working_directory);
+                        free(buf);
+                        free(header);
+                        return 1;
+                    };
+                    #else
                     if(mkdir(path, strtol(header->file_mode, NULL, 8))) {
                         fprintf(stderr, "Failed to make directory %s!\n", path);
                         free(initial_working_directory);
@@ -90,6 +99,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                         free(header);
                         return 1;
                     };
+                    #endif
                 }
             } else {
                 if (current_file != NULL) {

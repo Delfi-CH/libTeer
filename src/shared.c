@@ -7,8 +7,13 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <aclapi.h>
+#else
 #include <pwd.h>
 #include <grp.h>
+#endif
 
 static const char ZERO = {0};
 static const char ZERO_2[2] = {0};
@@ -229,18 +234,85 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         return NULL;
     }
     snprintf(header->file_mode, 8, "%07o", st.st_mode & 07777);
-    snprintf(header->owner_id, 8, "%07o", st.st_uid);
-    snprintf(header->group_id, 8, "%07o", st.st_gid);
+    #ifdef _WIN32
+        snprintf(header->owner_id, 8, "%07o", LIBTEER_DEFAULT_UID);
+        snprintf(header->group_id, 8, "%07o", LIBTEER_DEFAULT_GID);
+    #else
+        snprintf(header->owner_id, 8, "%07o", st.st_uid);
+        snprintf(header->group_id, 8, "%07o", st.st_gid);
+    #endif
     snprintf(header->file_size, 12, "%011o", (unsigned int)st.st_size);
-    snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtim.tv_sec);
+    #ifdef _WIN32
+        snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtime);
+    #else
+        snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtim.tv_sec);
+    #endif
     header->link = ZERO;
     memcpy(header->name_linked_file, ZERO_100, 100);
     snprintf(header->indicator, 6, "ustar");
     memcpy(header->version, ZERO_2, 2);
-    struct passwd *user = getpwuid(st.st_uid);
-    snprintf(header->username, 32, "%s", user->pw_name);
-    struct group *g = getgrgid(st.st_gid);
-    snprintf(header->groupname, 32, "%s", g->gr_name);
+    #ifdef _WIN32
+        PSID owner_sid = NULL;
+        PSID group_sid = NULL;
+        PSECURITY_DESCRIPTOR sd = NULL;
+
+        DWORD result = GetNamedSecurityInfoA(
+        (LPSTR)filename,
+        SE_FILE_OBJECT,
+        OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION,
+        &owner_sid,
+        &group_sid,
+        NULL,
+        NULL,
+        &sd
+    );
+
+    if (result != ERROR_SUCCESS) {
+        fprintf(stderr, "Failed to aquire security information: %lu\n", result);
+        free(header);
+        free(filebuf);
+        return NULL;
+    }
+
+    PSID sids[] = { owner_sid, group_sid };
+    const char *labels[] = { "Owner", "Group" };
+
+    for (int i = 0; i < 2; i++) {
+        char name[32];
+        char domain[32];
+
+        DWORD name_size = sizeof(name);
+        DWORD domain_size = sizeof(domain);
+
+        SID_NAME_USE sid_type;
+
+        if (LookupAccountSidA(
+                NULL,
+                sids[i],
+                name,
+                &name_size,
+                domain,
+                &domain_size,
+                &sid_type))
+        {
+            snprintf(header->username, 32, "%s", name);
+            snprintf(header->groupname, 32, "%s", name);
+        }
+        else {
+            fprintf(stderr, "%s: Failed to lookup account information (%lu)\n",
+                   labels[i], GetLastError());
+        }
+    }
+
+    LocalFree(sd);
+
+
+    #else
+        struct passwd *user = getpwuid(st.st_uid);
+        snprintf(header->username, 32, "%s", user->pw_name);
+        struct group *g = getgrgid(st.st_gid);
+        snprintf(header->groupname, 32, "%s", g->gr_name);
+    #endif
     memcpy(header->device_major_number, ZERO_8, 8);
     memcpy(header->device_minor_number, ZERO_8, 8);
     memcpy(header->padding, ZERO_12, 12);

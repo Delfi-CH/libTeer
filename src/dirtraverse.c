@@ -59,10 +59,17 @@ char **get_directory_list_recursive(const char *directory, char **list)
 
         struct stat st;
 
+        #ifdef _WIN32
+        if (stat(path, &st) == -1) {
+            free(path);
+            continue;
+        }
+        #else
         if (lstat(path, &st) == -1) {
             free(path);
             continue;
         }
+        #endif
 
         if (S_ISDIR(st.st_mode)) {
             path = realloc(path, len + 1);
