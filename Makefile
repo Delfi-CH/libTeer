@@ -24,7 +24,7 @@ ifeq ($(PLATFORM), windows)
 	CC = x86_64-w64-mingw32-gcc
 	AR = x86_64-w64-mingw32-ar
 	# temporarly disalbe compression on windows	
-	FEATURE_COMPRESSION = false 
+	# FEATURE_COMPRESSION = false 
 endif
 
 CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
@@ -60,7 +60,11 @@ ifeq ($(FEATURE_COMPRESSION), true)
 	LDFLAGS = -lz -lzstd -llzma -lbz2
 endif
 else
-	LDFLAGS = -ladvapi32
+ifeq ($(FEATURE_COMPRESSION), true)
+	LDFLAGS = -ladvapi32 -lz -lzstd -llzma -lbz2
+else
+	LDFLAGS = -lz -lzstd -llzma -lbz2
+endif
 endif
 endif
 
@@ -143,8 +147,12 @@ ZLIB_ARCHIVE = zlib-1.3.2.tar.gz
 ZLIB_URL = https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.tar.gz
 
 LZMA_SRC = xz-5.8.4
+ifeq ($(PLATFORM), windows)
+LZMA_OBJ = $(LZMA_SRC)/src/build-win64/liblzma.a
+else
 LZMA_OBJ = $(LZMA_SRC)/src/liblzma/.libs/liblzma.a
-LZMA_CONFIGURE_FLAGS = --disable-xz --disable-xzdec	--disable-scripts --disable-doc --disable-shared
+endif
+LZMA_CONFIGURE_FLAGS = --disable-xz --disable-xzdec	--disable-scripts --disable-doc
 LZMA_ARCHIVE = xz-5.8.4.tar.gz
 LZMA_URL = https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.gz
 
@@ -167,8 +175,15 @@ $(THIRDPARTY_DIR):
 	mkdir -p $(THIRDPARTY_DIR)
 
 ifeq ($(OUTPUT), shared)
+ifeq ($(PLATFORM), windows)
 $(PRODUCT): $(OBJ)
 	$(CC) -shared $(OBJ) $(LDFLAGS) -o $(PRODUCT)
+	gendef $(PRODUCT)
+	x86_64-w64-mingw32-dlltool -d $(NAME).def -D $(PRODUCT) -l $(PRODUCT).a
+else
+$(PRODUCT): $(OBJ)
+	$(CC) -shared $(OBJ) $(LDFLAGS) -o $(PRODUCT)
+endif
 else 
 ifeq ($(FEATURE_COMPRESSION), true)
 $(PRODUCT): $(THIRDPARTY_DIR) $(OBJ) $(COMPRESS_EXTERNAL_OBJ)
@@ -214,7 +229,11 @@ $(COMPRESS_EXTERNAL_OBJ) &: build-libraries
 build-libraries: $(BZIP2_OBJ) $(ZLIB_OBJ) $(LZMA_OBJ) $(ZSTD_OBJ)
 
 $(BZIP2_OBJ): $(BZIP2_SRC)
+ifeq ($(PLATFORM), windows)
+	cd $(BZIP2_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES) CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar RANLIB=x86_64-w64-mingw32-ranlib
+else
 	cd $(BZIP2_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
+endif
 
 $(BZIP2_SRC): $(BZIP2_ARCHIVE)
 	tar xzf $(BZIP2_ARCHIVE)
@@ -224,8 +243,12 @@ $(BZIP2_ARCHIVE):
 
 $(ZLIB_OBJ): $(ZLIB_SRC)
 	cd $(ZLIB_SRC) && ./configure
+ifeq ($(PLATFORM), windows)
+	cd $(ZLIB_SRC) && make -f win32/Makefile.gcc PREFIX=x86_64-w64-mingw32
+else
 	cd $(ZLIB_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
 	cd $(ZLIB_SRC) && make check
+endif
 
 $(ZLIB_SRC): $(ZLIB_ARCHIVE)
 	tar xzf $(ZLIB_ARCHIVE)
@@ -234,9 +257,22 @@ $(ZLIB_ARCHIVE):
 	wget $(ZLIB_URL)
 
 $(LZMA_OBJ): $(LZMA_SRC)
+ifeq ($(PLATFORM), windows)
+	cmake -S . -B build-win64 -G Ninja \
+  		-DCMAKE_SYSTEM_NAME=Windows \
+  		-DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
+  		-DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres \
+  		-DBUILD_SHARED_LIBS=OFF \
+  		-DBUILD_TESTING=OFF \
+  		-DCMAKE_BUILD_TYPE=Release \
+  		-DCMAKE_INSTALL_PREFIX=/opt/mingw-liblzma
+
+	cmake --build build-win64 --parallel
+else
 	cd $(LZMA_SRC) && ./configure $(LZMA_CONFIGURE_FLAGS)
 	cd $(LZMA_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
 	cd $(LZMA_SRC) && make check
+endif
 
 $(LZMA_SRC): $(LZMA_ARCHIVE)
 	tar xzf $(LZMA_ARCHIVE)
@@ -245,7 +281,11 @@ $(LZMA_ARCHIVE):
 	wget $(LZMA_URL)
 
 $(ZSTD_OBJ): $(ZSTD_SRC)
+ifeq ($(PLATFORM), windows)
+	cd $(ZSTD_SRC) && make TARGET_SYSTEM=Windows CC=x86_64-w64-mingw32-gcc HAVE_ZLIB=0 HAVE_LZMA=0 HAVE_LZ4=0 lib-release $(MAKEFLAGS_BUNDLED_LIBRARIES)
+else
 	cd $(ZSTD_SRC) && make HAVE_ZLIB=0 HAVE_LZMA=0 HAVE_LZ4=0 $(MAKEFLAGS_BUNDLED_LIBRARIES)
+endif
 
 $(ZSTD_SRC): $(ZSTD_ARCHIVE)
 	tar xzf $(ZSTD_ARCHIVE)
@@ -281,6 +321,12 @@ ifeq ($(OUTPUT), static)
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ).exe
 	wine $(TEST_VERSION_OBJ).exe
 else
+# temporarly copy over required dlls from /usr/x86_64-w64-mingw32/bin
+	cp /usr/x86_64-w64-mingw32/bin/libssp-0.dll .
+	cp /usr/x86_64-w64-mingw32/bin/libbz2-1.dll .
+	cp /usr/x86_64-w64-mingw32/bin/zlib1.dll .
+	cp /usr/x86_64-w64-mingw32/bin/liblzma-5.dll .
+	cp /usr/x86_64-w64-mingw32/bin/libzstd.dll .
 	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ).exe
 	wine $(TEST_UNPACK_OBJ).exe
 	$(CC) $(CFLAGS) $(TEST_MERGE_SRC) -L$(PWD) -lTeer -o $(TEST_MERGE_OBJ).exe

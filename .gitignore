@@ -7,6 +7,7 @@ zstd-*
 build
 *.so
 *.dll
+*.def
 *.exe
 *.a
 *.o
