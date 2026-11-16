@@ -200,9 +200,9 @@ make PLATFORM=windows test
 make clean
 # removes all artifacts from the directories
 
-make VERSION=0.1.0
+make VERSION=0.1.0 PLATFORM=windows
 # use a specific version string instead of the latest commit
 
-make OUTPUT=static
+make OUTPUT=static PLATFORM=windows
 # creates a .a archive instead of a shared object for static linking.
 ```
