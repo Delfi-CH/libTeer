@@ -40,7 +40,7 @@ int main() {
         return 1;
     }
     printf("creating test.tar.zstd...\n");
-    rc = libTeer_create("test", "test.tar.zstd\n", AUTO_COMPRESSION);
+    rc = libTeer_create("test", "test.tar.zstd", AUTO_COMPRESSION);
     if (rc == -2) {
         printf("compression mode not supported\n");
         return 0;

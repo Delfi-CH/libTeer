@@ -40,7 +40,7 @@ int main() {
         return 1;
     }
     printf("merging src.tar into foo.tar.zstd...\n");
-    rc = libTeer_merge("src.tar", "foo.tar.zstd\n", AUTO_COMPRESSION, AUTO_COMPRESSION);
+    rc = libTeer_merge("src.tar", "foo.tar.zstd", AUTO_COMPRESSION, AUTO_COMPRESSION);
     if (rc == -2) {
         printf("compression mode not supported\n");
         return 0;

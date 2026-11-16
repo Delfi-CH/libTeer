@@ -40,7 +40,7 @@ int main() {
         return 1;
     }
     printf("unpacking foo.tar.zstd...\n");
-    rc = libTeer_unpack("foo.tar.zstd\n", "/tmp", AUTO_COMPRESSION);
+    rc = libTeer_unpack("foo.tar.zstd", "/tmp", AUTO_COMPRESSION);
     if (rc == -2) {
         printf("compression mode not supported\n");
         return 0;
