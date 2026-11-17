@@ -53,7 +53,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
         return 1;
     }
 
-    FILE *archive = fopen(archive_name, "r+");
+    FILE *archive = fopen(archive_name, "rb");
     if (archive == NULL)
     {
         fprintf(stderr, "Failed to open file %s!\n", archive_name);
@@ -79,7 +79,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
         free(fbuf);
         return 1;
     }
-    
+
     int target_records_length = st.st_size / LIBTEER_RECORD_LENGTH;
     for (int i = 0; i < target_records_length; i++)
     {
@@ -165,7 +165,33 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     memcpy(target_records[target_records_length - 1], zero_record, LIBTEER_RECORD_LENGTH);
     memcpy(target_records[target_records_length - 2], zero_record, LIBTEER_RECORD_LENGTH);
 
-    rewind(archive);
+    if (fclose(archive) != 0)
+    {
+        fprintf(stderr, "Could not close file %s!\n", archive_name);
+        if (fbuf->records != NULL)
+        {
+            free(fbuf->records);
+        }
+        free(fbuf->header);
+        free(fbuf);
+        free(target_records);
+        return 1;
+    }
+
+    archive = fopen(archive_name, "wb");
+    if (archive == NULL)
+    {
+        fprintf(stderr, "Failed to open file %s!\n", archive_name);
+        if (fbuf->records != NULL)
+        {
+            free(fbuf->records);
+        }
+        free(fbuf->header);
+        free(fbuf);
+        free(target_records);
+        return 1;
+    }
+
     for (int i = 0; i < target_records_length; i++)
     {
         for (int j = 0; j < LIBTEER_RECORD_LENGTH; j++)
@@ -193,7 +219,8 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     }
     free(fbuf->header);
     free(fbuf);
-    if (fclose(archive) != 0) {
+    if (fclose(archive) != 0)
+    {
         fprintf(stderr, "Could not close file %s!\n", archive_name);
         return 1;
     }
@@ -205,19 +232,24 @@ int libTeer_append(const char *archive_name, const char *filename, libTeer_Compr
 {
     int rc = 0;
     libTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
-    if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
+    if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE)
+    {
+        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;
         return rc;
     }
 
-    if (compression_mode == 0) {
+    if (compression_mode == 0)
+    {
         used_mode = get_mode_from_filename(archive_name);
-        if (used_mode == -1) {
+        if (used_mode == -1)
+        {
             rc = -2;
             return rc;
         }
-    } else {
+    }
+    else
+    {
         used_mode = compression_mode;
     }
 
@@ -263,9 +295,12 @@ int libTeer_append(const char *archive_name, const char *filename, libTeer_Compr
         return rc;
     }
 
-    if (used_mode == NOCOMPRESS) {
+    if (used_mode == NOCOMPRESS)
+    {
         rc = libTeer_basic_append(archive_name, filename);
-    } else {
+    }
+    else
+    {
         rc = libTeer_basic_append(rand_filename, filename);
     }
     if (rc != 0)

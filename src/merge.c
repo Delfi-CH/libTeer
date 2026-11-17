@@ -43,13 +43,13 @@ int libTeer_basic_merge(const char *source, const char *target) {
         return 1;
     }
 
-    FILE *sourcefile = fopen(source, "r");
+    FILE *sourcefile = fopen(source, "rb");
     if (sourcefile == NULL) {
         fprintf(stderr, "Failed to open file %s!\n", source);
         return 1;
     }
 
-    FILE *targetfile = fopen(target, "r+");
+    FILE *targetfile = fopen(target, "rb");
     if (targetfile == NULL) {
         fprintf(stderr, "Failed to open file %s!\n", target);
         fclose(sourcefile);
@@ -134,7 +134,18 @@ int libTeer_basic_merge(const char *source, const char *target) {
 
     free(source_records);
 
-    rewind(targetfile);
+    if (fclose(targetfile) != 0) {
+        fprintf(stderr, "Could not close file %s!\n", target);
+        free(new_records);
+        return 1;
+    }
+    targetfile = fopen(target, "wb");
+    if (targetfile == NULL) {
+        fprintf(stderr, "Failed to open file %s!\n", target);
+        free(new_records);
+        return 1;
+    }
+
     for (int i = 0; i < target_records_length; i++) {
         for (int j = 0; j < LIBTEER_RECORD_LENGTH; j++) {
             if (fputc(target_records[i][j], targetfile) == EOF) {

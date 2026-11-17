@@ -19,7 +19,7 @@ int libTeer_basic_create(const char *directory, const char *output)
         return 1;
     }
 
-    FILE *outfile = fopen(output, "w");
+    FILE *outfile = fopen(output, "wb");
     if (outfile == NULL)
     {
         fprintf(stderr, "Failed to open file '%s'!\n", output);

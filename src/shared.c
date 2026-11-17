@@ -347,7 +347,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
             return NULL;
         }
 
-        FILE *file = fopen(filename, "r");
+        FILE *file = fopen(filename, "rb");
         if (file == NULL)
         {
             fprintf(stderr, "Failed to open file %s!\n", filename);

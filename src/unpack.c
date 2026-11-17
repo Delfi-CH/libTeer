@@ -32,7 +32,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         return 1;
     }
 
-    FILE *tarball = fopen(filename, "r");
+    FILE *tarball = fopen(filename, "rb");
     if (tarball == NULL) {
         fprintf(stderr, "Failed to open file %s!\n", filename);
         return 1;
@@ -118,7 +118,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                     free(header);
                     return 1;
                 }  
-                current_file = fopen(current_filename, "w");
+                current_file = fopen(current_filename, "wb");
                 if (current_file == NULL) {
                     fprintf(stderr, "Failed to open file %s", current_filename);
                     free(initial_working_directory);
