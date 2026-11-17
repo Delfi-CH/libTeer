@@ -37,6 +37,10 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 - [x] Unpacking archives
 - [x] Appending to archives
 - [x] Merging archives
+- [ ] List the contents of an archive
+- [ ] Extract specific files from an archive
+- [ ] Delete specific files from an archive
+- [ ] Operations on files and on data in memory
 
 **(De)Compression:**
 
