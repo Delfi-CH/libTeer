@@ -148,7 +148,7 @@ ZLIB_URL = https://github.com/madler/zlib/releases/download/v1.3.2/zlib-1.3.2.ta
 
 LZMA_SRC = xz-5.8.4
 ifeq ($(PLATFORM), windows)
-LZMA_OBJ = $(LZMA_SRC)/src/build-win64/liblzma.a
+LZMA_OBJ = $(LZMA_SRC)/build-win64/liblzma.a
 else
 LZMA_OBJ = $(LZMA_SRC)/src/liblzma/.libs/liblzma.a
 endif
@@ -187,7 +187,11 @@ endif
 else 
 ifeq ($(FEATURE_COMPRESSION), true)
 $(PRODUCT): $(THIRDPARTY_DIR) $(OBJ) $(COMPRESS_EXTERNAL_OBJ)
+ifeq ($(PLATFORM), windows)
+	$(AR) rcs $(PRODUCT) $(OBJ) $(THIRDPARTY_DIR)/libbz2/*.o $(THIRDPARTY_DIR)/libz/*.o $(THIRDPARTY_DIR)/liblzma/*.obj $(THIRDPARTY_DIR)/libzstd/*.o
+else
 	$(AR) rcs $(PRODUCT) $(OBJ) $(THIRDPARTY_DIR)/libbz2/*.o $(THIRDPARTY_DIR)/libz/*.o $(THIRDPARTY_DIR)/liblzma/*.o $(THIRDPARTY_DIR)/libzstd/*.o
+endif
 else
 $(PRODUCT): $(OBJ)
 	$(AR) rcs $(PRODUCT) $(OBJ)
@@ -218,7 +222,11 @@ $(COMPRESS_EXTERNAL_OBJ) &: build-libraries
 	cp $(LZMA_OBJ) $(THIRDPARTY_DIR)/
 	mkdir -p $(THIRDPARTY_DIR)/liblzma
 	ar x --output=$(THIRDPARTY_DIR)/liblzma $(LZMA_OBJ)
+ifeq ($(PLATFORM), windows)
+	cd $(THIRDPARTY_DIR)/liblzma && for f in *.obj; do mv -- "$$f" "liblzma_$$f"; done
+else
 	cd $(THIRDPARTY_DIR)/liblzma && for f in *.o; do mv -- "$$f" "liblzma_$$f"; done
+endif
 	cp $(ZSTD_OBJ) $(THIRDPARTY_DIR)/
 	mkdir -p $(THIRDPARTY_DIR)/libzstd
 	ar x --output=$(THIRDPARTY_DIR)/libzstd $(ZSTD_OBJ)
@@ -230,7 +238,7 @@ build-libraries: $(BZIP2_OBJ) $(ZLIB_OBJ) $(LZMA_OBJ) $(ZSTD_OBJ)
 
 $(BZIP2_OBJ): $(BZIP2_SRC)
 ifeq ($(PLATFORM), windows)
-	cd $(BZIP2_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES) CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar RANLIB=x86_64-w64-mingw32-ranlib
+	cd $(BZIP2_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES) CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar RANLIB=x86_64-w64-mingw32-ranlib libbz2.a
 else
 	cd $(BZIP2_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
 endif
@@ -244,7 +252,7 @@ $(BZIP2_ARCHIVE):
 $(ZLIB_OBJ): $(ZLIB_SRC)
 	cd $(ZLIB_SRC) && ./configure
 ifeq ($(PLATFORM), windows)
-	cd $(ZLIB_SRC) && make -f win32/Makefile.gcc PREFIX=x86_64-w64-mingw32
+	cd $(ZLIB_SRC) && make -f win32/Makefile.gcc PREFIX=x86_64-w64-mingw32-
 else
 	cd $(ZLIB_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
 	cd $(ZLIB_SRC) && make check
@@ -258,7 +266,7 @@ $(ZLIB_ARCHIVE):
 
 $(LZMA_OBJ): $(LZMA_SRC)
 ifeq ($(PLATFORM), windows)
-	cmake -S . -B build-win64 -G Ninja \
+	cd $(LZMA_SRC) && cmake -S . -B build-win64 -G Ninja \
   		-DCMAKE_SYSTEM_NAME=Windows \
   		-DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc \
   		-DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres \
@@ -267,7 +275,7 @@ ifeq ($(PLATFORM), windows)
   		-DCMAKE_BUILD_TYPE=Release \
   		-DCMAKE_INSTALL_PREFIX=/opt/mingw-liblzma
 
-	cmake --build build-win64 --parallel
+	cd $(LZMA_SRC) && cmake --build build-win64 --parallel
 else
 	cd $(LZMA_SRC) && ./configure $(LZMA_CONFIGURE_FLAGS)
 	cd $(LZMA_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
