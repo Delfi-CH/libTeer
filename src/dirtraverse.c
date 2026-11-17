@@ -146,3 +146,15 @@ void free_directory_list(struct filellist *list)
     free(list->data);
     free(list);
 }
+
+void libTeer_free_directory_list(LibTeer_Filelist *list) {
+    if (list == NULL)
+        return;
+
+    for (size_t i = 0; i < list->length; i++) {
+        free(list->data[i]);
+    }
+
+    free(list->data);
+    free(list);
+}

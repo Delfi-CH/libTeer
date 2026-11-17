@@ -186,7 +186,8 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         return NULL;
     }
     LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
-    if (header == NULL) {
+    if (header == NULL)
+    {
         fprintf(stderr, "Failed to allocate memory!\n");
         return NULL;
     }
@@ -198,16 +199,20 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         return NULL;
     }
     struct ustar_filebuf *filebuf = malloc(sizeof(struct ustar_filebuf));
-    if (filebuf == NULL) {
+    if (filebuf == NULL)
+    {
         fprintf(stderr, "Failed to allocate memory!\n");
         free(header);
         return NULL;
     }
 
-    if (strlen(filename) < 100) {
+    if (strlen(filename) < 100)
+    {
         snprintf(header->file_path, 100, "%s", filename);
         memcpy(header->filename_prefix, ZERO_155, 155);
-    } else if (strlen(filename) < 256) {
+    }
+    else if (strlen(filename) < 256)
+    {
         char *dupfilename = strdup(filename);
         char prefix_buf[156];
         snprintf(prefix_buf, 156, "%s", filename);
@@ -215,7 +220,8 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         prefix_buf[strlen(prefix_buf) - strlen(prefix_end)] = '\0';
         size_t prefix_len = strlen(prefix_buf);
         memmove(dupfilename, dupfilename + prefix_len + 1, strlen(dupfilename) - prefix_len);
-        if (strlen(dupfilename) > 99) {
+        if (strlen(dupfilename) > 99)
+        {
             fprintf(stderr, "Filename %s cannot be split!\n", filename);
             free(dupfilename);
             free(prefix_end);
@@ -227,36 +233,38 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         snprintf(header->filename_prefix, strlen(prefix_buf) + 1, "%s", prefix_buf);
         free(dupfilename);
         free(prefix_end);
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "Filename %s is longer than 255 characters!\n", filename);
         free(header);
         free(filebuf);
         return NULL;
     }
     snprintf(header->file_mode, 8, "%07o", st.st_mode & 07777);
-    #ifdef _WIN32
-        snprintf(header->owner_id, 8, "%07o", LIBTEER_DEFAULT_UID);
-        snprintf(header->group_id, 8, "%07o", LIBTEER_DEFAULT_GID);
-    #else
-        snprintf(header->owner_id, 8, "%07o", st.st_uid);
-        snprintf(header->group_id, 8, "%07o", st.st_gid);
-    #endif
+#ifdef _WIN32
+    snprintf(header->owner_id, 8, "%07o", LIBTEER_DEFAULT_UID);
+    snprintf(header->group_id, 8, "%07o", LIBTEER_DEFAULT_GID);
+#else
+    snprintf(header->owner_id, 8, "%07o", st.st_uid);
+    snprintf(header->group_id, 8, "%07o", st.st_gid);
+#endif
     snprintf(header->file_size, 12, "%011o", (unsigned int)st.st_size);
-    #ifdef _WIN32
-        snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtime);
-    #else
-        snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtim.tv_sec);
-    #endif
+#ifdef _WIN32
+    snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtime);
+#else
+    snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtim.tv_sec);
+#endif
     header->link = ZERO;
     memcpy(header->name_linked_file, ZERO_100, 100);
     snprintf(header->indicator, 6, "ustar");
     memcpy(header->version, ZERO_2, 2);
-    #ifdef _WIN32
-        PSID owner_sid = NULL;
-        PSID group_sid = NULL;
-        PSECURITY_DESCRIPTOR sd = NULL;
+#ifdef _WIN32
+    PSID owner_sid = NULL;
+    PSID group_sid = NULL;
+    PSECURITY_DESCRIPTOR sd = NULL;
 
-        DWORD result = GetNamedSecurityInfoA(
+    DWORD result = GetNamedSecurityInfoA(
         (LPSTR)filename,
         SE_FILE_OBJECT,
         OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION,
@@ -264,20 +272,21 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         &group_sid,
         NULL,
         NULL,
-        &sd
-    );
+        &sd);
 
-    if (result != ERROR_SUCCESS) {
+    if (result != ERROR_SUCCESS)
+    {
         fprintf(stderr, "Failed to aquire security information: %lu\n", result);
         free(header);
         free(filebuf);
         return NULL;
     }
 
-    PSID sids[] = { owner_sid, group_sid };
-    const char *labels[] = { "Owner", "Group" };
+    PSID sids[] = {owner_sid, group_sid};
+    const char *labels[] = {"Owner", "Group"};
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 2; i++)
+    {
         char name[32];
         char domain[32];
 
@@ -298,21 +307,21 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
             snprintf(header->username, 32, "%s", name);
             snprintf(header->groupname, 32, "%s", name);
         }
-        else {
+        else
+        {
             fprintf(stderr, "%s: Failed to lookup account information (%lu)\n",
-                   labels[i], GetLastError());
+                    labels[i], GetLastError());
         }
     }
 
     LocalFree(sd);
 
-
-    #else
-        struct passwd *user = getpwuid(st.st_uid);
-        snprintf(header->username, 32, "%s", user->pw_name);
-        struct group *g = getgrgid(st.st_gid);
-        snprintf(header->groupname, 32, "%s", g->gr_name);
-    #endif
+#else
+    struct passwd *user = getpwuid(st.st_uid);
+    snprintf(header->username, 32, "%s", user->pw_name);
+    struct group *g = getgrgid(st.st_gid);
+    snprintf(header->groupname, 32, "%s", g->gr_name);
+#endif
     memcpy(header->device_major_number, ZERO_8, 8);
     memcpy(header->device_minor_number, ZERO_8, 8);
     memcpy(header->padding, ZERO_12, 12);
@@ -324,7 +333,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     {
         checksum += bytes[i];
     }
-    snprintf(header->checksum, sizeof(header->checksum),"%06o", checksum);
+    snprintf(header->checksum, sizeof(header->checksum), "%06o", checksum);
     header->checksum[6] = '\0';
     header->checksum[7] = ' ';
 
@@ -372,7 +381,9 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         }
         filebuf->records = records;
         filebuf->record_count = record_count;
-    } else {
+    }
+    else
+    {
         filebuf->records = NULL;
         filebuf->record_count = 0;
     }
@@ -389,4 +400,104 @@ char *ustar_header_to_data(LibTeer_UStarHeader *header)
         return NULL;
     memcpy(data, header, sizeof(LibTeer_UStarHeader));
     return data;
+}
+
+struct headerlist *get_headers_of_file(const char *filename)
+{
+    if (filename == NULL)
+        return NULL;
+
+    struct stat st;
+    if (stat(filename, &st))
+    {
+        fprintf(stderr, "Failed to stat file %s!\n", filename);
+        return NULL;
+    }
+
+    if (st.st_size % LIBTEER_RECORD_LENGTH)
+    {
+        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", filename, LIBTEER_RECORD_LENGTH);
+        return NULL;
+    }
+
+    LibTeer_UStarHeader **headers = malloc(sizeof(LibTeer_UStarHeader *));
+    if (headers == NULL)
+    {
+        fprintf(stderr, "Failed to allocate memory!\n");
+        return NULL;
+    }
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Failed to open %s!\n", filename);
+        free(headers);
+        return NULL;
+    }
+
+    int count = 0;
+    bool error = false;
+    char buf[LIBTEER_RECORD_LENGTH] = {0};
+    while (true)
+    {
+        size_t read = fread(buf, 1, LIBTEER_RECORD_LENGTH, file);
+        if (read < 512)
+        {
+            break;
+        }
+        if (is_record_ustar_header(buf))
+        {
+            LibTeer_UStarHeader **tmp = realloc(
+                headers,
+                (count + 1) * sizeof(LibTeer_UStarHeader *));
+
+            if (tmp == NULL)
+            {
+                error = true;
+                break;
+            }
+
+            headers = tmp;
+
+            headers[count] = malloc(sizeof(LibTeer_UStarHeader));
+
+            if (headers[count] == NULL)
+            {
+                error = true;
+                break;
+            }
+
+            memcpy(headers[count], buf, sizeof(LibTeer_UStarHeader));
+
+            count++;
+        }
+
+        if (error)
+        {
+            break;
+        }
+    }
+
+    if (error)
+    {
+        free(headers);
+        fclose(file);
+        return NULL;
+    }
+
+    fclose(file);
+
+    struct headerlist *list = malloc(sizeof(struct headerlist));
+    if (list == NULL) {
+        fprintf(stderr, "Failed to allocate memory!\n");
+        return NULL;
+    }
+    list->length = count;
+    list->headers = headers;
+    return list;
+}
+
+void free_headerlist(struct headerlist *list) {
+    free(list->headers);
+    free(list);
 }

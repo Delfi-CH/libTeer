@@ -102,8 +102,8 @@ ifeq ($(FEATURE_COMPRESSION), true)
 endif
 
 
-CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c $(SRCDIR)/dirtraverse.c
-CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o $(BUILDDIR)/dirtraverse.o
+CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c $(SRCDIR)/dirtraverse.c $(SRCDIR)/list.c
+CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o $(BUILDDIR)/dirtraverse.o $(BUILDDIR)/list.o
 
 COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/compress/xz.c $(SRCDIR)/compress/zstd.c
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
@@ -132,6 +132,9 @@ TEST_APPEND_OBJ=test_append
 
 TEST_CREATE_SRC=$(TESTDIR)/test_create.c 
 TEST_CREATE_OBJ=test_create
+
+TEST_LIST_SRC=$(TESTDIR)/test_list.c 
+TEST_LIST_OBJ=test_list
 
 TEST_VERSION_SRC=$(TESTDIR)/test_version.c 
 TEST_VERSION_OBJ=test_version
@@ -367,6 +370,8 @@ else
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_APPEND_OBJ)
 	$(CC) $(CFLAGS) $(TEST_CREATE_SRC) -L$(PWD) -lTeer -o $(TEST_CREATE_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_CREATE_OBJ)
+	$(CC) $(CFLAGS) $(TEST_LIST_SRC) -L$(PWD) -lTeer -o $(TEST_LIST_OBJ)
+	LD_LIBRARY_PATH=$(PWD) ./$(TEST_LIST_OBJ)
 	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_VERSION_OBJ)
 endif

@@ -15,9 +15,9 @@ struct ustar_filebuf {
     int record_count;
 };
 
-struct filellist
+struct headerlist 
 {
-    char **data;
+    LibTeer_UStarHeader **headers;
     int length;
 };
 
@@ -33,7 +33,9 @@ libTeer_Compression_Mode get_mode_from_filename(const char *filename);
 void print_record(const char *record);
 struct ustar_filebuf *file_to_ustar_buffer(const char *filename);
 char *ustar_header_to_data(LibTeer_UStarHeader *header);
-struct filellist *get_directory_list(const char *directory);
-void free_directory_list(struct filellist *list);
+LibTeer_Filelist *get_directory_list(const char *directory);
+struct headerlist *get_headers_of_file(const char *filename);
+void free_headerlist(struct headerlist *list);
+void free_directory_list(LibTeer_Filelist *list);
 
 #endif

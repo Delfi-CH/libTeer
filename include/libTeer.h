@@ -57,6 +57,12 @@ typedef struct __attribute__((packed))
     char padding[12];
 } LibTeer_UStarHeader;
 
+typedef struct filellist
+{
+    char **data;
+    int length;
+} LibTeer_Filelist;
+
 // Enums
 
 typedef enum mode
@@ -88,6 +94,20 @@ typedef enum format
     Get the current version string, returns a semver-like format for releases eg. (0.1.1) or the git commit hash.
 */
 char *libTeer_get_version();
+
+/*
+    Get a list of files in an archive.
+    The resulting LibTeer_Filelist has to be freed with 'free_directory_list(LibTeer_Filelist *list)'
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+LibTeer_Filelist *libTeer_list_files(const char *archive_name, libTeer_Compression_Mode compression_mode);
+
+/*
+    Get a list of files in an archive.
+    Returns 0 on success and anything else on failiure.
+*/
+LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name);
 
 /*
     Append file to archive.
@@ -142,5 +162,10 @@ int libTeer_unpack(const char *filename, const char *directory, libTeer_Compress
     Returns 0 on success and anything else on failiure.
 */
 int libTeer_basic_unpack(const char *filename, const char *directory);
+
+/*
+    Free a filelist datastructure
+*/
+void libTeer_free_directory_list(LibTeer_Filelist *list);
 
 #endif
