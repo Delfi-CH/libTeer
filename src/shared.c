@@ -59,7 +59,7 @@ bool is_record_ustar_header(const char *record)
     if (record == NULL)
         return false;
 
-    return memcmp(record + 257, "ustar", 5) == 0;
+    return memcmp(record + 257, "ustar ", 6) == 0;
 }
 
 void print_ustar_header_info(LibTeer_UStarHeader *header)
@@ -256,7 +256,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtime);
     header->link = ZERO;
     memcpy(header->name_linked_file, ZERO_100, 100);
-    snprintf(header->indicator, 6, "ustar");
+    memcpy(header->indicator, "ustar ", 6);
     memcpy(header->version, ZERO_2, 2);
 #ifdef _WIN32
     PSID owner_sid = NULL;
