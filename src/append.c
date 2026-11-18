@@ -336,5 +336,11 @@ int libTeer_append(const char *archive_name, const char *filename, libTeer_Compr
         break;
     }
 
+    if (rc != 0) return rc;
+
+    if (used_mode != NOCOMPRESS) {
+        rc = remove(rand_filename);
+    }
+
     return rc;
 }

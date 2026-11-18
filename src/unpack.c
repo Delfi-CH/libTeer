@@ -172,7 +172,6 @@ int libTeer_unpack(const char *filename, const char *directory, libTeer_Compress
         used_mode = compression_mode;
     }
 
-
     switch (used_mode)
     {
     case NOCOMPRESS:

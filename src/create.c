@@ -184,5 +184,13 @@ int libTeer_create(const char *directory, const char *output, libTeer_Compressio
         break;
     }
 
+    if (rc != 0) {
+        return rc;
+    }
+
+    if (used_mode != NOCOMPRESS) {
+        rc = remove(rand_filename);
+    }
+
     return rc;
 }

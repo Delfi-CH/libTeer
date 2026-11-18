@@ -1,3 +1,5 @@
+#define _XOPEN_SOURCE 500
+
 #include "../include/libTeer/private.h"
 #include "../include/libTeer.h"
 #include <stdlib.h>
@@ -7,6 +9,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <unistd.h>
 #ifdef _WIN32
 #include <windows.h>
 #include <aclapi.h>
@@ -250,11 +253,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     snprintf(header->group_id, 8, "%07o", st.st_gid);
 #endif
     snprintf(header->file_size, 12, "%011o", (unsigned int)st.st_size);
-#ifdef _WIN32
     snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtime);
-#else
-    snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtim.tv_sec);
-#endif
     header->link = ZERO;
     memcpy(header->name_linked_file, ZERO_100, 100);
     snprintf(header->indicator, 6, "ustar");

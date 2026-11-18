@@ -259,7 +259,7 @@ int libTeer_zstd_unpack(const char *filename, const char *directory)
         return 1;
     }
 
-    remove(rand_filename);
+    rc = remove(rand_filename);
 
-    return 0;
+    return rc;
 }

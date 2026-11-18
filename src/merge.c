@@ -318,5 +318,13 @@ int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mo
         break;
     }
 
+    if (source_used_mode != NOCOMPRESS) {
+        rc = remove(rand_filename_source);
+    }
+
+    if (target_used_mode != NOCOMPRESS) {
+        rc = remove(rand_filename_target);
+    }
+
     return rc;
 }
