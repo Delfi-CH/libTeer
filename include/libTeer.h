@@ -164,6 +164,21 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
 int libTeer_basic_unpack(const char *filename, const char *directory);
 
 /*
+    Extract a specific file from an archive to outdir.
+    If outdir is null, the current working directory is used instead.
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+int libTeer_filextract(const char *archive_name, const char *filename, const char *outdir, LibTeer_Compression_Mode compression_mode);
+
+/*
+    Extract a specific file from an archive to outdir.
+    If outdir is null, the current working directory is used instead.
+    Returns 0 on success and anything else on failiure.
+*/
+int libTeer_basic_filextract(const char *archive_name, const char *filename, const char *outdir);
+
+/*
     Free a filelist datastructure
 */
 void libTeer_free_directory_list(LibTeer_Filelist *list);
