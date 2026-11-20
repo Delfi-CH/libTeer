@@ -38,6 +38,8 @@ endif
 endif
 endif
 
+OUTPUT = shared
+
 ifeq ($(CC), gcc)
 ifeq ($(OUTPUT), shared)
 ifeq ($(FEATURE_ASAN), true)
@@ -46,7 +48,6 @@ endif
 endif
 endif
 
-OUTPUT = shared
 ifeq ($(OUTPUT), shared)
 	CFLAGS += -fPIC
 else
