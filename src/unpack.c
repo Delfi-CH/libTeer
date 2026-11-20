@@ -40,6 +40,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
 
     if(chdir(directory)) {
         fprintf(stderr, "Failed to change directory to %s!\n", directory);
+        fclose(tarball);
         return 1;
     }
 
@@ -49,6 +50,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
     LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
     if (header == NULL) {
         fprintf(stderr, "Failed to allocate memory!\n");
+        fclose(tarball);
         return 2;
     }
 
@@ -57,10 +59,12 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         buf = read_single_record(tarball);
         if (i == 0 && !is_record_ustar_header(buf)) {
             fprintf(stderr, "File %s is not a ustar tarball!\n", filename);
+            fclose(tarball);
             return 1;
         }
         if (buf == NULL) {
             fprintf(stderr, "Failed to read buffer!\n");
+            fclose(tarball);
             return 2;
         }
 
@@ -85,6 +89,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 } else {
                     #ifdef _WIN32
                     if(mkdir(path)) {
+                        fclose(tarball);
                         fprintf(stderr, "Failed to make directory %s!\n", path);
                         free(initial_working_directory);
                         free(buf);
@@ -93,6 +98,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                     };
                     #else
                     if(mkdir(path, strtol(header->file_mode, NULL, 8))) {
+                        fclose(tarball);
                         fprintf(stderr, "Failed to make directory %s!\n", path);
                         free(initial_working_directory);
                         free(buf);
@@ -104,6 +110,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
             } else {
                 if (current_file != NULL) {
                     if(fclose(current_file)) {
+                        fclose(tarball);
                         fprintf(stderr, "Failed to close file %s!\n", current_filename);
                         free(initial_working_directory);
                         free(buf);
@@ -113,6 +120,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 }
                 if (snprintf(current_filename, sizeof(char) * 255, "%s", path) < 0) {
                     fprintf(stderr, "Failed to write filename %s!\n", path);
+                    fclose(tarball);
                     free(initial_working_directory);
                     free(buf);
                     free(header);
@@ -120,6 +128,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 }  
                 current_file = fopen(current_filename, "wb");
                 if (current_file == NULL) {
+                    fclose(tarball);
                     fprintf(stderr, "Failed to open file %s", current_filename);
                     free(initial_working_directory);
                     free(buf);
@@ -131,6 +140,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         else
         {
             if (current_file == NULL) {
+                fclose(tarball);
                 fprintf(stderr, "Attempted to write to a null pointer! Aborting...\n");
                 free(initial_working_directory);
                 free(buf);
@@ -147,6 +157,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         free(buf);
     }
 
+    fclose(tarball);
     chdir(initial_working_directory);
     free(initial_working_directory);
     free(header);
