@@ -41,7 +41,7 @@ int libTeer_basic_create(const char *directory, const char *output)
             fprintf(stderr, "Failed to convert %s into a buffer!\n", list->data[i]);
             free_directory_list(list);
             return 1;
-        }
+        }   
 
         size_t written = 0;
         char *header_data = ustar_header_to_data(fbuf->header);

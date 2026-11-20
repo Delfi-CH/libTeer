@@ -19,7 +19,6 @@
 #endif
 
 static const char ZERO = {0};
-static const char ZERO_2[2] = {0};
 static const char ZERO_8[8] = {0};
 static const char ZERO_12[12] = {0};
 static const char ZERO_100[100] = {0};
@@ -59,7 +58,7 @@ bool is_record_ustar_header(const char *record)
     if (record == NULL)
         return false;
 
-    return memcmp(record + 257, "ustar ", 6) == 0;
+    return memcmp(record + 257, "ustar ", 6) == 0 || memcmp(record + 257, "ustar", 5) == 0;
 }
 
 void print_ustar_header_info(LibTeer_UStarHeader *header)
@@ -177,7 +176,10 @@ void print_record(const char *record)
     printf("\n");
     for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++)
     {
-        printf("%d", (int)record[i]);
+        printf("%02X", (unsigned int)record[i]);
+
+        if ((i + 1) % 16 == 0)
+            printf("\n");
     }
     printf("\n");
 }
@@ -188,7 +190,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     {
         return NULL;
     }
-    LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
+    LibTeer_UStarHeader *header = calloc(1, sizeof(LibTeer_UStarHeader));
     if (header == NULL)
     {
         fprintf(stderr, "Failed to allocate memory!\n");
@@ -256,8 +258,10 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     snprintf(header->modif_time, 12, "%011o", (unsigned int)st.st_mtime);
     header->link = ZERO;
     memcpy(header->name_linked_file, ZERO_100, 100);
-    memcpy(header->indicator, "ustar ", 6);
-    memcpy(header->version, ZERO_2, 2);
+    memcpy(header->indicator, "ustar", 5);
+    header->indicator[5] = '\0';
+
+    memcpy(header->version, "00", 2);
 #ifdef _WIN32
     PSID owner_sid = NULL;
     PSID group_sid = NULL;
@@ -497,6 +501,9 @@ struct headerlist *get_headers_of_file(const char *filename)
 }
 
 void free_headerlist(struct headerlist *list) {
+    for (int i = 0; i < list->length; i++) {
+        free(list->headers[i]);
+    }
     free(list->headers);
     free(list);
 }
