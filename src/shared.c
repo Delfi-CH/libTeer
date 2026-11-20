@@ -104,10 +104,10 @@ char *get_file_extension(char *filename)
     return NULL;
 }
 
-libTeer_Compression_Mode get_mode_from_filename(const char *filename)
+LibTeer_Compression_Mode get_mode_from_filename(const char *filename)
 {
     char *dupfnmape = strdup(filename);
-    libTeer_Compression_Mode return_mode;
+    LibTeer_Compression_Mode return_mode;
     char *ext = get_file_extension(dupfnmape);
     if (strncmp(ext, "tar", 3) == 0)
     {

@@ -153,9 +153,9 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
     return 0;
 }
 
-int libTeer_unpack(const char *filename, const char *directory, libTeer_Compression_Mode compression_mode) {
+int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compression_Mode compression_mode) {
     int rc = 0;
-    libTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
+    LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
         fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
         rc = 1;

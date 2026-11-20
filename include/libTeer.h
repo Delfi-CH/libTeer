@@ -76,7 +76,7 @@ typedef enum mode
     BZIP2 = 4,
     ZSTD = 5,
     COMPRESSION_MODE_SIZE
-} libTeer_Compression_Mode;
+} LibTeer_Compression_Mode;
 
 typedef enum format
 {
@@ -86,7 +86,7 @@ typedef enum format
     PAX = 3,
     GNU = 4,
     OLDGNU = 5,
-} libTeer_File_Format;
+} LibTeer_File_Format;
 
 // Functions
 
@@ -101,7 +101,7 @@ char *libTeer_get_version();
     If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
     Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
 */
-LibTeer_Filelist *libTeer_list_files(const char *archive_name, libTeer_Compression_Mode compression_mode);
+LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compression_Mode compression_mode);
 
 /*
     Get a list of files in an archive.
@@ -114,7 +114,7 @@ LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name);
     If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
     Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
 */
-int libTeer_append(const char *archive_name, const char *filename, libTeer_Compression_Mode compression_mode);
+int libTeer_append(const char *archive_name, const char *filename, LibTeer_Compression_Mode compression_mode);
 
 /*
     Append file to archive.
@@ -127,7 +127,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename);
     If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
     Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
 */
-int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mode source_compression_mode, libTeer_Compression_Mode target_compression_mode);
+int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mode source_compression_mode, LibTeer_Compression_Mode target_compression_mode);
 
 /*
     Merge the contents of source into target.
@@ -140,7 +140,7 @@ int libTeer_basic_merge(const char *source, const char *target);
     If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the output name.
     Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
 */
-int libTeer_create(const char *directory, const char *output, libTeer_Compression_Mode compression_mode);
+int libTeer_create(const char *directory, const char *output, LibTeer_Compression_Mode compression_mode);
 
 /*
     Create an archive from a directory.
@@ -154,7 +154,7 @@ int libTeer_basic_create(const char *directory, const char *output);
     If the directory is null, the current working directory is used instead.
     Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
 */
-int libTeer_unpack(const char *filename, const char *directory, libTeer_Compression_Mode compression_mode);
+int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compression_Mode compression_mode);
 
 /*
     Unpack an uncompressed tar archive into a directory.

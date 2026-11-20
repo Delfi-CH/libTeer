@@ -166,9 +166,9 @@ int libTeer_basic_merge(const char *source, const char *target) {
     return 0;
 }
 
-int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mode source_compression_mode, libTeer_Compression_Mode target_compression_mode) {
+int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mode source_compression_mode, LibTeer_Compression_Mode target_compression_mode) {
     int rc = 0;
-    libTeer_Compression_Mode source_used_mode = AUTO_COMPRESSION;
+    LibTeer_Compression_Mode source_used_mode = AUTO_COMPRESSION;
     if (source_compression_mode < 0 || source_compression_mode > COMPRESSION_MODE_SIZE) {
         fprintf(stderr, "Source compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;
@@ -185,7 +185,7 @@ int libTeer_merge(const char *source, const char *target, libTeer_Compression_Mo
         source_used_mode = source_compression_mode;
     }
 
-    libTeer_Compression_Mode target_used_mode = AUTO_COMPRESSION;
+    LibTeer_Compression_Mode target_used_mode = AUTO_COMPRESSION;
     if (target_compression_mode < 0 || target_compression_mode > COMPRESSION_MODE_SIZE) {
         fprintf(stderr, "Target compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;

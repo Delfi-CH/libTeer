@@ -57,10 +57,10 @@ LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name) {
     return filellist;
 }
 
-LibTeer_Filelist *libTeer_list_files(const char *archive_name, libTeer_Compression_Mode compression_mode) {
+LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compression_Mode compression_mode) {
     if (archive_name == NULL) return NULL;
     
-    libTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
+    LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
         fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
         return NULL;
