@@ -51,9 +51,8 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 
 ## Known issues / Limitations
 
-- Windows builds cannot use compression.
 - Paths can only be 255 characters long. This is a limitation of the ustar format.
-- No explicit support for GNU TAR (old and new), original UNIX V7 and PAX archive formats.
+- No (current) explicit support for GNU TAR (old and new), original UNIX V7 and PAX archive formats.
 
 ## Usage
 
