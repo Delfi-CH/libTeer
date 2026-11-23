@@ -39,7 +39,7 @@ See [https://github.com/Delfi-CH/libTeer#building](https://github.com/Delfi-CH/l
 - [x] Merging archives
 - [x] List the contents of an archive
 - [x] Extract specific files from an archive
-- [ ] Delete specific files from an archive
+- [x] Delete specific files from an archive
 - [ ] Operations on files and on data in memory
 
 **(De)Compression:**
@@ -138,6 +138,7 @@ make
 
 - wget
 - GNU autotools
+- cmake
 
 #### Build options
 
@@ -185,6 +186,19 @@ make PKGTYPE=git archlinux-install
 - GNU Make
 - GNU coreutils
 - mingw
+
+**For compression:** 
+
+- zlib-dev
+- liblzma-dev
+- libbz2-dev
+- libzstd-dev
+
+**For building a static library with compression:**
+
+- wget
+- GNU autotools
+- cmake
 
 #### Building the project
 

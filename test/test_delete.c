@@ -3,6 +3,7 @@
 
 int main() {
     printf("deleting src/dirtraverse.c from src2.tar...\n");
-    libTeer_basic_delete("src2.tar", "src/dirtraverse.c");
+    libTeer_delete("src2.tar", "src/dirtraverse.c", AUTO_COMPRESSION);
+    printf("done\n");
     return 0;
 }

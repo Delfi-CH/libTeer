@@ -131,7 +131,11 @@ int libTeer_basic_delete(const char *archive_name, const char *filename)
     free(initial_records);
 
     if (copied != final_record_count) {
-        fprintf(stderr, "Did not copy right amount of data, expected %ld, got %ld\n", final_record_count, copied);
+        #ifdef _WIN32
+            fprintf(stderr, "Did not copy right amount of data, expected %lld, got %lld\n", final_record_count, copied);
+        #else
+            fprintf(stderr, "Did not copy right amount of data, expected %ld, got %ld\n", final_record_count, copied);
+        #endif
         free(final_records);
         return 1;
     }
@@ -147,7 +151,11 @@ int libTeer_basic_delete(const char *archive_name, const char *filename)
     for (int i = 0; i < final_record_count; i++) {
         size_t written = fwrite(final_records[i].data, LIBTEER_RECORD_LENGTH, 1, archive);
         if (written != LIBTEER_RECORD_LENGTH && written != 1) {
-            fprintf(stderr, "Did not write correct amount of data to file %s, expected %d, got %ld\n", archive_name, LIBTEER_RECORD_LENGTH, written);
+            #ifdef _WIN32
+                fprintf(stderr, "Did not write correct amount of data to file %s, expected %d, got %lld\n", archive_name, LIBTEER_RECORD_LENGTH, written);
+            #else
+                fprintf(stderr, "Did not write correct amount of data to file %s, expected %d, got %ld\n", archive_name, LIBTEER_RECORD_LENGTH, written);
+            #endif
             free(final_records);
             fclose(archive);
             return 1;
@@ -157,4 +165,121 @@ int libTeer_basic_delete(const char *archive_name, const char *filename)
     free(final_records);
     fclose(archive);
     return 0;
+}
+
+int libTeer_delete(const char *archive_name, const char *filename, LibTeer_Compression_Mode compression_mode)
+{
+    int rc = 0;
+    LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
+    if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE)
+    {
+        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
+        rc = 1;
+        return rc;
+    }
+
+    if (compression_mode == 0)
+    {
+        used_mode = get_mode_from_filename(archive_name);
+        if (used_mode == -1)
+        {
+            rc = -2;
+            return rc;
+        }
+    }
+    else
+    {
+        used_mode = compression_mode;
+    }
+
+    char rand_filename[1024];
+    char str[] = {[41] = '\1'};
+    rand_str(str, sizeof str - 1);
+    rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
+    if (rc < 0)
+    {
+        fprintf(stderr, "error: could not generate filename\n");
+        return 1;
+    }
+
+    rc = 0;
+
+    switch (used_mode)
+    {
+    case NOCOMPRESS:
+        break;
+    case GZIP:
+        rc = libTeer_gzip_decompress(archive_name, rand_filename);
+        break;
+    case XZ:
+        rc = libTeer_xz_decompress(archive_name, rand_filename);
+        break;
+    case BZIP2:
+        rc = libTeer_bzip2_decompress(archive_name, rand_filename);
+        break;
+    case ZSTD:
+        rc = libTeer_zstd_decompress(archive_name, rand_filename);
+        break;
+    case AUTO_COMPRESSION:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    case COMPRESSION_MODE_SIZE:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    }
+    if (rc != 0)
+    {
+        return rc;
+    }
+
+    if (used_mode == NOCOMPRESS)
+    {
+        rc = libTeer_basic_delete(archive_name, filename);
+    }
+    else
+    {
+        rc = libTeer_basic_delete(rand_filename, filename);
+    }
+    if (rc != 0)
+    {
+        return rc;
+    }
+
+    rc = 0;
+
+    switch (used_mode)
+    {
+    case NOCOMPRESS:
+        break;
+    case GZIP:
+        rc = libTeer_gzip_compress(rand_filename, archive_name);
+        break;
+    case XZ:
+        rc = libTeer_xz_compress(rand_filename, archive_name, LIBTEER_DEFAULT_XZ_COMPRESSION_LEVEL);
+        break;
+    case BZIP2:
+        rc = libTeer_bzip2_compress(rand_filename, archive_name, LIBTEER_DEFAULT_BZIP2_COMPRESSION_LEVEL, LIBTEER_DEFAULT_BZIP2_WORK_FACTOR);
+        break;
+    case ZSTD:
+        rc = libTeer_zstd_compress(rand_filename, archive_name, LIBTEER_DEFAULT_ZSTD_COMPRESSION_LEVEL);
+        break;
+    case AUTO_COMPRESSION:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    case COMPRESSION_MODE_SIZE:
+        rc = -2;
+        fprintf(stderr, "An unexpected error occured!\n");
+        break;
+    }
+
+    if (rc != 0) return rc;
+
+    if (used_mode != NOCOMPRESS) {
+        rc = remove(rand_filename);
+    }
+
+    return rc;
 }
