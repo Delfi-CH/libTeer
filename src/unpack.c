@@ -183,22 +183,33 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
         used_mode = compression_mode;
     }
 
+    char rand_filename[1024];
+    char str[] = {[41] = '\1'};
+    rand_str(str, sizeof str - 1);
+    rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
+    if (rc < 0)
+    {
+        fprintf(stderr, "error: could not generate filename\n");
+        return 1;
+    }
+
+    rc = 0;
+
     switch (used_mode)
     {
     case NOCOMPRESS:
-        rc = libTeer_basic_unpack(filename, directory);
         break;
     case GZIP:
-        rc = libTeer_gzip_unpack(filename, directory);
+        rc = libTeer_gzip_decompress(filename, rand_filename);
         break;
     case XZ:
-        rc = libTeer_xz_unpack(filename, directory);
+        rc = libTeer_xz_decompress(filename, rand_filename);
         break;
     case BZIP2:
-        rc = libTeer_bzip2_unpack(filename, directory);
+        rc = libTeer_bzip2_decompress(filename, rand_filename);
         break;
     case ZSTD:
-        rc = libTeer_zstd_unpack(filename, directory);
+        rc = libTeer_zstd_decompress(filename, rand_filename);
         break;
     case AUTO_COMPRESSION:
         rc = -2;
@@ -208,6 +219,24 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
         rc = -2;
         fprintf(stderr, "An unexpected error occured!\n");
         break;
+    }
+    if (rc != 0)
+    {
+        return rc;
+    }
+
+    if (used_mode == NOCOMPRESS) {
+        rc = libTeer_basic_unpack(filename, directory);
+    } else {
+        rc = libTeer_basic_unpack(rand_filename, directory);
+    }
+    if (rc != 0)
+    {
+        return rc;
+    }
+
+    if (used_mode != NOCOMPRESS) {
+        rc = remove(rand_filename);
     }
 
     return rc;

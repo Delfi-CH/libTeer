@@ -173,33 +173,3 @@ int libTeer_bzip2_compress(const char *infile, const char *outfile, int compress
 
     return result;
 }
-
-int libTeer_bzip2_unpack(const char *filename, const char *directory)
-{
-    char rand_filename[1024];
-    char str[] = {[41] = '\1'};
-    rand_str(str, sizeof str - 1);
-    int rc = 0;
-    rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
-    if (rc < 0)
-    {
-        fprintf(stderr, "error: could not generate filename\n");
-        return 1;
-    }
-    rc = libTeer_bzip2_decompress(filename, rand_filename);
-    if (rc != 0)
-    {
-        fprintf(stderr, "error: could not decompress %s\n", filename);
-        return 1;
-    }
-    rc = libTeer_basic_unpack(rand_filename, directory);
-    if (rc < 0)
-    {
-        fprintf(stderr, "error: could not unpack %s\n", rand_filename);
-        return 1;
-    }
-
-    rc = remove(rand_filename);
-
-    return rc;
-}
