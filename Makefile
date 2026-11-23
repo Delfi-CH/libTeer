@@ -103,8 +103,8 @@ ifeq ($(FEATURE_COMPRESSION), true)
 endif
 
 
-CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c $(SRCDIR)/dirtraverse.c $(SRCDIR)/list.c $(SRCDIR)/extract.c
-CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o $(BUILDDIR)/dirtraverse.o $(BUILDDIR)/list.o $(BUILDDIR)/extract.o
+CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c $(SRCDIR)/dirtraverse.c $(SRCDIR)/list.c $(SRCDIR)/extract.c $(SRCDIR)/delete.c
+CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o $(BUILDDIR)/dirtraverse.o $(BUILDDIR)/list.o $(BUILDDIR)/extract.o $(BUILDDIR)/delete.o
 
 COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/compress/xz.c $(SRCDIR)/compress/zstd.c
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
@@ -139,6 +139,9 @@ TEST_LIST_OBJ=test_list
 
 TEST_EXTRACT_SRC=$(TESTDIR)/test_extract.c 
 TEST_EXTRACT_OBJ=test_extract
+
+TEST_DELETE_SRC=$(TESTDIR)/test_delete.c 
+TEST_DELETE_OBJ=test_delete
 
 TEST_VERSION_SRC=$(TESTDIR)/test_version.c 
 TEST_VERSION_OBJ=test_version
@@ -337,6 +340,8 @@ ifeq ($(OUTPUT), static)
 	wine $(TEST_LIST_OBJ).exe
 	$(CC) $(TEST_EXTRACT_SRC) $(PRODUCT) -o $(TEST_EXTRACT_OBJ).exe
 	wine $(TEST_EXTRACT_OBJ).exe
+	$(CC) $(TEST_DELETE_SRC) $(PRODUCT) -o $(TEST_DELETE_OBJ).exe
+	wine $(TEST_DELETE_OBJ).exe
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ).exe
 	wine $(TEST_VERSION_OBJ).exe
 else
@@ -358,6 +363,8 @@ else
 	wine $(TEST_LIST_OBJ).exe
 	$(CC) $(CFLAGS) $(TEST_EXTRACT_SRC) -L$(PWD) -lTeer -o $(TEST_EXTRACT_OBJ).exe
 	wine $(TEST_EXTRACT_OBJ).exe
+	$(CC) $(CFLAGS) $(TEST_DELETE_SRC) -L$(PWD) -lTeer -o $(TEST_DELETE_OBJ).exe
+	wine $(TEST_DELETE_OBJ).exe
 	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ).exe
 	wine $(TEST_VERSION_OBJ).exe
 endif
@@ -375,6 +382,8 @@ ifeq ($(OUTPUT), static)
 	./$(TEST_LIST_OBJ)
 	$(CC) $(TEST_EXTRACT_SRC) $(PRODUCT) -o $(TEST_EXTRACT_OBJ)
 	./$(TEST_EXTRACT_OBJ)
+	$(CC) $(TEST_DELETE_SRC) $(PRODUCT) -o $(TEST_DELETE_OBJ)
+	./$(TEST_DELETE_OBJ)
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ)
 	./$(TEST_VERSION_OBJ)
 else
@@ -390,6 +399,8 @@ else
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_LIST_OBJ)
 	$(CC) $(CFLAGS) $(TEST_EXTRACT_SRC) -L$(PWD) -lTeer -o $(TEST_EXTRACT_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_EXTRACT_OBJ)
+	$(CC) $(CFLAGS) $(TEST_DELETE_SRC) -L$(PWD) -lTeer -o $(TEST_DELETE_OBJ)
+	LD_LIBRARY_PATH=$(PWD) ./$(TEST_DELETE_OBJ)
 	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ)
 	LD_LIBRARY_PATH=$(PWD) ./$(TEST_VERSION_OBJ)
 endif

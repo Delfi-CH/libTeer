@@ -179,6 +179,20 @@ int libTeer_filextract(const char *archive_name, const char *filename, const cha
 int libTeer_basic_filextract(const char *archive_name, const char *filename, const char *outdir);
 
 /*
+    Delete a specific file from an archive.
+    If compression_mode is set to 0/AUTO_COMPRESSION, the mode will be determined by the extension of the filename.
+    Returns 0 on success, -2 on unsupported compression mode / file type and anything else on failiure.
+*/
+int libTeer_delete(const char *archive_name, const char *filename, LibTeer_Compression_Mode compression_mode);
+
+
+/*
+    Delete a specific file from an archive.
+    Returns 0 on success and anything else on failiure.
+*/
+int libTeer_basic_delete(const char *archive_name, const char *filename);
+
+/*
     Free a filelist datastructure
 */
 void libTeer_free_directory_list(LibTeer_Filelist *list);

@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <libgen.h>
-#include <assert.h>
 
 int libTeer_basic_filextract(const char *archive_name, const char *filename, const char *outdir) {
     if (filename == NULL) {
@@ -20,11 +19,19 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
 
     char *outfname = NULL;
     char *tmpdup = strdup(filename);
-    assert(tmpdup != NULL);
+    if (tmpdup == NULL) {
+            fprintf(stderr, "Failed to allocate memory!\n");
+            return 1;
+        }
     char *basefname = basename(tmpdup);
 
     if (outdir == NULL) {
         outfname = strdup(filename);
+        if (outfname == NULL) {
+            fprintf(stderr, "Failed to allocate memory!\n");
+            free(tmpdup);
+            return 1;
+        }
     } else {
         outfname = calloc((strlen(filename) + strlen(outdir) + 2), sizeof(char));
         if (outfname == NULL) {
@@ -67,6 +74,7 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
         char *buf = read_single_record(archive);
         if (buf == NULL) {
             fprintf(stderr, "Failed to read buffer from %s!\n", archive_name);
+            fclose(archive);
             free(tmpdup);
             free(outfname);
             return 1;
