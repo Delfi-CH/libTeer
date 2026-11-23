@@ -335,6 +335,8 @@ ifeq ($(OUTPUT), static)
 	wine $(TEST_CREATE_OBJ).exe
 	$(CC) $(TEST_LIST_SRC) $(PRODUCT) -o $(TEST_LIST_OBJ).exe
 	wine $(TEST_LIST_OBJ).exe
+	$(CC) $(TEST_EXTRACT_SRC) $(PRODUCT) -o $(TEST_EXTRACT_OBJ).exe
+	wine $(TEST_EXTRACT_OBJ).exe
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ).exe
 	wine $(TEST_VERSION_OBJ).exe
 else
@@ -354,6 +356,8 @@ else
 	wine $(TEST_CREATE_OBJ).exe
 	$(CC) $(CFLAGS) $(TEST_LIST_SRC) -L$(PWD) -lTeer -o $(TEST_LIST_OBJ).exe
 	wine $(TEST_LIST_OBJ).exe
+	$(CC) $(CFLAGS) $(TEST_EXTRACT_SRC) -L$(PWD) -lTeer -o $(TEST_EXTRACT_OBJ).exe
+	wine $(TEST_EXTRACT_OBJ).exe
 	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ).exe
 	wine $(TEST_VERSION_OBJ).exe
 endif
@@ -369,6 +373,8 @@ ifeq ($(OUTPUT), static)
 	./$(TEST_CREATE_OBJ)
 	$(CC) $(TEST_LIST_SRC) $(PRODUCT) -o $(TEST_LIST_OBJ)
 	./$(TEST_LIST_OBJ)
+	$(CC) $(TEST_EXTRACT_SRC) $(PRODUCT) -o $(TEST_EXTRACT_OBJ)
+	./$(TEST_EXTRACT_OBJ)
 	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ)
 	./$(TEST_VERSION_OBJ)
 else
