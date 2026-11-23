@@ -12,19 +12,16 @@ VERSION ?= $(shell git rev-parse HEAD)
 
 # Compression library makeflags
 
-MAKEFLAGS_BUNDLED_LIBRARIES = -j4
+MAKEFLAGS_BUNDLED_LIBRARIES = -j4 -s
 
 # Compiler options
 
 CC = gcc
 AR = gcc-ar
 
-
 ifeq ($(PLATFORM), windows)
 	CC = x86_64-w64-mingw32-gcc
 	AR = x86_64-w64-mingw32-ar
-	# temporarly disalbe compression on windows	
-	# FEATURE_COMPRESSION = false 
 endif
 
 CFLAGS = -Wall -Werror -DLIBTEER_VERSION_STRING=\"$(VERSION)\"
@@ -160,7 +157,7 @@ LZMA_SRC = xz-5.8.4
 ifeq ($(PLATFORM), windows)
 LZMA_OBJ = $(LZMA_SRC)/build-win64/liblzma.a
 else
-LZMA_OBJ = $(LZMA_SRC)/src/liblzma/.libs/liblzma.a
+LZMA_OBJ = $(LZMA_SRC)/build/liblzma.a
 endif
 LZMA_CONFIGURE_FLAGS = --disable-xz --disable-xzdec	--disable-scripts --disable-doc
 LZMA_ARCHIVE = xz-5.8.4.tar.gz
@@ -174,9 +171,27 @@ ZSTD_URL = https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.
 # Targets
 
 .PHONY: all
+.PHONY: do-build
 .PHONY: objects
 
-all: $(BUILDDIR) $(PRODUCT)
+all: 
+	@echo Target Platform: 			$(PLATFORM)
+	@echo Build mode: 				$(OUTPUT)
+	@echo Output: 					$(PRODUCT)
+	@echo libTeer version string: 	$(VERSION)
+	@echo C Compiler \(cc\): 		$(CC)
+	@echo Archiver \(ar\): 			$(AR)
+	@echo CFLAGS: 					$(CFLAGS)
+	@echo LDFLAGS: 					$(LDFLAGS)
+ifeq ($(FEATURE_COMPRESSION), true)
+	@echo Building with compression
+else
+	@echo Building without compression
+endif
+	@echo --------------------------------------------------------------------------------
+	$(MAKE) do-build
+
+do-build: $(BUILDDIR) $(PRODUCT)
 
 $(BUILDDIR):
 	mkdir -p $(BUILDDIR)
@@ -262,10 +277,10 @@ $(BZIP2_ARCHIVE):
 $(ZLIB_OBJ): $(ZLIB_SRC)
 	cd $(ZLIB_SRC) && ./configure
 ifeq ($(PLATFORM), windows)
-	cd $(ZLIB_SRC) && make -f win32/Makefile.gcc PREFIX=x86_64-w64-mingw32-
+	cd $(ZLIB_SRC) && make -s -f win32/Makefile.gcc PREFIX=x86_64-w64-mingw32-
 else
 	cd $(ZLIB_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
-	cd $(ZLIB_SRC) && make check
+	cd $(ZLIB_SRC) && make check -s
 endif
 
 $(ZLIB_SRC): $(ZLIB_ARCHIVE)
@@ -287,9 +302,12 @@ ifeq ($(PLATFORM), windows)
 
 	cd $(LZMA_SRC) && cmake --build build-win64 --parallel
 else
-	cd $(LZMA_SRC) && ./configure $(LZMA_CONFIGURE_FLAGS)
-	cd $(LZMA_SRC) && make $(MAKEFLAGS_BUNDLED_LIBRARIES)
-	cd $(LZMA_SRC) && make check
+	cd $(LZMA_SRC) && cmake -S . -B build -G Ninja \
+  		-DBUILD_SHARED_LIBS=OFF \
+  		-DBUILD_TESTING=OFF \
+  		-DCMAKE_BUILD_TYPE=Release \
+  		-DCMAKE_INSTALL_PREFIX=/opt/liblzma
+	cd $(LZMA_SRC) && cmake --build build --parallel
 endif
 
 $(LZMA_SRC): $(LZMA_ARCHIVE)
