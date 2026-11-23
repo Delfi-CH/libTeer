@@ -127,7 +127,7 @@ int libTeer_gzip_unpack(const char *filename, const char *directory)
     char str[] = {[41] = '\1'};
     rand_str(str, sizeof str - 1);
     int rc = 0;
-    rc = snprintf(rand_filename, 1024, "/tmp/%s", str);
+    rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
         fprintf(stderr, "error: could not generate filename\n");

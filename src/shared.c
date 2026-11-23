@@ -24,6 +24,18 @@ static const char ZERO_12[12] = {0};
 static const char ZERO_100[100] = {0};
 static const char ZERO_155[155] = {0};
 
+char *get_tmpdir_path() {
+    #ifdef _WIN32
+        static char tmp_path[MAX_PATH + 1];
+        DWORD result = GetTempPathA(sizeof(tmp_path), tmp_path);
+        if (result == 0) return NULL;
+        if (result > sizeof(tmp_path)) return NULL;
+        return tmp_path;
+    #else
+        return "/tmp/";
+    #endif
+}
+
 void rand_str(char *dest, size_t length)
 {
     char charset[] = "0123456789"

@@ -256,7 +256,7 @@ int libTeer_append(const char *archive_name, const char *filename, LibTeer_Compr
     char rand_filename[1024];
     char str[] = {[41] = '\1'};
     rand_str(str, sizeof str - 1);
-    rc = snprintf(rand_filename, 1024, "/tmp/%s", str);
+    rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
         fprintf(stderr, "error: could not generate filename\n");

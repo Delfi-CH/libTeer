@@ -37,5 +37,6 @@ LibTeer_Filelist *get_directory_list(const char *directory);
 struct headerlist *get_headers_of_file(const char *filename);
 void free_headerlist(struct headerlist *list);
 void free_directory_list(LibTeer_Filelist *list);
+char *get_tmpdir_path();
 
 #endif

@@ -205,7 +205,7 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
     char rand_filename_source[1024];
     char str_source[] = {[41] = '\1'};
     rand_str(str_source, sizeof str_source - 1);
-    rc = snprintf(rand_filename_source, 1024, "/tmp/%s", str_source);
+    rc = snprintf(rand_filename_source, 1024, "%s%s", get_tmpdir_path(), str_source);
     if (rc < 0)
     {
         fprintf(stderr, "error: could not generate filename\n");
@@ -215,7 +215,7 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
     char rand_filename_target[1024];
     char str_target[] = {[41] = '\1'};
     rand_str(str_target, sizeof str_target - 1);
-    rc = snprintf(rand_filename_target, 1024, "/tmp/%s", str_target);
+    rc = snprintf(rand_filename_target, 1024, "%s%s", get_tmpdir_path(), str_target);
     if (rc < 0)
     {
         fprintf(stderr, "error: could not generate filename\n");
