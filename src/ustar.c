@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <libgen.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -23,47 +22,6 @@ static const char ZERO_8[8] = {0};
 static const char ZERO_12[12] = {0};
 static const char ZERO_100[100] = {0};
 static const char ZERO_155[155] = {0};
-
-char *get_tmpdir_path() {
-    #ifdef _WIN32
-        static char tmp_path[MAX_PATH + 1];
-        DWORD result = GetTempPathA(sizeof(tmp_path), tmp_path);
-        if (result == 0) return NULL;
-        if (result > sizeof(tmp_path)) return NULL;
-        return tmp_path;
-    #else
-        return "/tmp/";
-    #endif
-}
-
-void rand_str(char *dest, size_t length)
-{
-    char charset[] = "0123456789"
-                     "abcdefghijklmnopqrstuvwxyz"
-                     "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-    while (length-- > 0)
-    {
-        size_t index = (double)rand() / RAND_MAX * (sizeof charset - 1);
-        *dest++ = charset[index];
-    }
-    *dest = '\0';
-}
-
-char *read_single_record(FILE *tarball)
-{
-    char *buffer = malloc(LIBTEER_RECORD_LENGTH * sizeof(char));
-    if (buffer == NULL)
-    {
-        fprintf(stderr, "Failed to allocate memory!\n");
-        return NULL;
-    }
-    for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++)
-    {
-        buffer[i] = fgetc(tarball);
-    }
-    return buffer;
-}
 
 bool is_record_ustar_header(const char *record)
 {
@@ -91,109 +49,6 @@ void print_ustar_header_info(LibTeer_UStarHeader *header)
     printf("device_major_number: %ld\n", strtol(header->device_major_number, NULL, 10));
     printf("device_minor_number: %ld\n", strtol(header->device_minor_number, NULL, 10));
     printf("filename_prefix: %s\n", header->filename_prefix);
-}
-
-char *libTeer_get_version()
-{
-    return LIBTEER_VERSION_STRING;
-}
-
-char *get_file_extension(char *filename)
-{
-    char *basefile = basename(filename);
-
-    char *token = strtok(basefile, ".");
-    char *lasttoken;
-    while (token != NULL)
-    {
-        lasttoken = token;
-        token = strtok(NULL, ".");
-        if (token == NULL)
-        {
-            return lasttoken;
-        }
-    }
-    return NULL;
-}
-
-LibTeer_Compression_Mode get_mode_from_filename(const char *filename)
-{
-    char *dupfnmape = strdup(filename);
-    LibTeer_Compression_Mode return_mode;
-    char *ext = get_file_extension(dupfnmape);
-    if (strncmp(ext, "tar", 3) == 0)
-    {
-        return_mode = NOCOMPRESS;
-    }
-    else if (strncmp(ext, "gz", 2) == 0)
-    {
-        return_mode = GZIP;
-    }
-    else if (strncmp(ext, "gzip", 4) == 0)
-    {
-        return_mode = GZIP;
-    }
-    else if (strncmp(ext, "tgz", 3) == 0)
-    {
-        return_mode = GZIP;
-    }
-    else if (strncmp(ext, "xz", 2) == 0)
-    {
-        return_mode = XZ;
-    }
-    else if (strncmp(ext, "lzma", 4) == 0)
-    {
-        return_mode = XZ;
-    }
-    else if (strncmp(ext, "txz", 3) == 0)
-    {
-        return_mode = XZ;
-    }
-    else if (strncmp(ext, "lz", 2) == 0)
-    {
-        return_mode = XZ;
-    }
-    else if (strncmp(ext, "bz2", 3) == 0)
-    {
-        return_mode = BZIP2;
-    }
-    else if (strncmp(ext, "zst", 3) == 0)
-    {
-        return_mode = ZSTD;
-    }
-    else if (strncmp(ext, "zstd", 4) == 0)
-    {
-        return_mode = ZSTD;
-    }
-    else if (strncmp(ext, "tstd", 3) == 0)
-    {
-        return_mode = ZSTD;
-    }
-    else
-    {
-        fprintf(stderr, "Failed to determine compression mode from file extension '%s'!\n", ext);
-        free(dupfnmape);
-        return -1;
-    }
-    free(dupfnmape);
-    return return_mode;
-}
-
-void print_record(const char *record)
-{
-    for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++)
-    {
-        printf("%c", record[i]);
-    }
-    printf("\n");
-    for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++)
-    {
-        printf("%02X", (unsigned int)record[i]);
-
-        if ((i + 1) % 16 == 0)
-            printf("\n");
-    }
-    printf("\n");
 }
 
 struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
@@ -417,7 +272,7 @@ char *ustar_header_to_data(LibTeer_UStarHeader *header)
     return data;
 }
 
-struct headerlist *get_headers_of_file(const char *filename)
+struct ustar_headerlist *get_ustar_headers_of_file(const char *filename)
 {
     if (filename == NULL)
         return NULL;
@@ -502,7 +357,7 @@ struct headerlist *get_headers_of_file(const char *filename)
 
     fclose(file);
 
-    struct headerlist *list = malloc(sizeof(struct headerlist));
+    struct ustar_headerlist *list = malloc(sizeof(struct ustar_headerlist));
     if (list == NULL) {
         fprintf(stderr, "Failed to allocate memory!\n");
         return NULL;
@@ -512,7 +367,7 @@ struct headerlist *get_headers_of_file(const char *filename)
     return list;
 }
 
-void free_headerlist(struct headerlist *list) {
+void free_ustar_headerlist(struct ustar_headerlist *list) {
     for (int i = 0; i < list->length; i++) {
         free(list->headers[i]);
     }

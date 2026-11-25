@@ -7,7 +7,7 @@
 
 LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name) {
     if (archive_name == NULL) return NULL;
-    struct headerlist *list = get_headers_of_file(archive_name);
+    struct ustar_headerlist *list = get_ustar_headers_of_file(archive_name);
     if (list == NULL) {
         fprintf(stderr, "Failed to get list of headers!\n");
         return NULL;
@@ -15,7 +15,7 @@ LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name) {
 
     LibTeer_Filelist *filellist = malloc(sizeof(LibTeer_Filelist));
     if (filellist == NULL) {
-        free_headerlist(list);
+        free_ustar_headerlist(list);
         return NULL;
     }
 
@@ -24,7 +24,7 @@ LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name) {
 
     if (filellist->data == NULL && list->length > 0) {
         free(filellist);
-        free_headerlist(list);
+        free_ustar_headerlist(list);
         return NULL;
     }
 
@@ -48,12 +48,12 @@ LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name) {
             }
             free(filellist->data);
             free(filellist);
-            free_headerlist(list);
+            free_ustar_headerlist(list);
             return NULL;
         }
     }
 
-    free_headerlist(list);
+    free_ustar_headerlist(list);
     return filellist;
 }
 

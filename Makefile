@@ -100,8 +100,8 @@ ifeq ($(FEATURE_COMPRESSION), true)
 endif
 
 
-CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/shared.c $(SRCDIR)/dirtraverse.c $(SRCDIR)/list.c $(SRCDIR)/extract.c $(SRCDIR)/delete.c
-CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/shared.o $(BUILDDIR)/dirtraverse.o $(BUILDDIR)/list.o $(BUILDDIR)/extract.o $(BUILDDIR)/delete.o
+CORE_SRC = $(SRCDIR)/append.c $(SRCDIR)/merge.c $(SRCDIR)/create.c $(SRCDIR)/unpack.c $(SRCDIR)/ustar.c $(SRCDIR)/dirtraverse.c $(SRCDIR)/list.c $(SRCDIR)/extract.c $(SRCDIR)/delete.c $(SRCDIR)/misc.c $(SRCDIR)/file.c $(SRCDIR)/record.c
+CORE_OBJ = $(BUILDDIR)/append.o $(BUILDDIR)/merge.o $(BUILDDIR)/create.o $(BUILDDIR)/unpack.o $(BUILDDIR)/ustar.o $(BUILDDIR)/dirtraverse.o $(BUILDDIR)/list.o $(BUILDDIR)/extract.o $(BUILDDIR)/delete.o $(BUILDDIR)/misc.o $(BUILDDIR)/file.o $(BUILDDIR)/record.o
 
 COMPRESS_SRC = $(SRCDIR)/compress/bzip2.c $(SRCDIR)/compress/gzip.c $(SRCDIR)/compress/xz.c $(SRCDIR)/compress/zstd.c
 COMPRESS_OBJ = $(BUILDDIR)/bzip2.o $(BUILDDIR)/gzip.o $(BUILDDIR)/xz.o $(BUILDDIR)/zstd.o 
