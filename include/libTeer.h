@@ -9,19 +9,47 @@
 #ifndef LIBTEER_H
 #define LIBTEER_H
 
-// Data structures
+// Includes
 
-/*
-    Data structures taken from
-    https://github.com/tsoding/tarballs/
-    which is MIT-licensed
-*/
+#include <stddef.h>
+
+// Enums
+
+typedef enum mode
+{
+    AUTO_COMPRESSION = 0,
+    NOCOMPRESS = 1,
+    GZIP = 2,
+    ZLIB = 2,
+    XZ = 3,
+    LZMA = 3,
+    BZIP2 = 4,
+    ZSTD = 5,
+    COMPRESSION_MODE_SIZE
+} LibTeer_Compression_Mode;
+
+typedef enum format
+{
+    AUTO_FORMAT = 0,
+    POSIX = 1, // Not yet implemented
+    USTAR = 2,
+    PAX = 3, // Not yet implemented
+    GNU = 4, // Not yet implemented
+    OLDGNU = 5, // Not yet implemented
+} LibTeer_File_Format;
+
+// Data structures
 
 typedef struct
 {
     char data[LIBTEER_RECORD_LENGTH];
 } LibTeer_Record;
 
+/*
+    Data structures taken from
+    https://github.com/tsoding/tarballs/
+    which is MIT-licensed
+*/
 typedef struct __attribute__((packed))
 {
     char file_path[100];
@@ -57,36 +85,36 @@ typedef struct __attribute__((packed))
     char padding[12];
 } LibTeer_UStarHeader;
 
+typedef union header
+{
+    LibTeer_StandardHeader *posix;
+    LibTeer_UStarHeader *ustar;
+} LibTeer_Header_Union;
+
+
+typedef struct generic_header {
+    LibTeer_File_Format format;
+    LibTeer_Header_Union as;
+} LibTeer_Header;
+
 typedef struct filellist
 {
     char **data;
     int length;
 } LibTeer_Filelist;
 
-// Enums
+typedef struct file {
+    LibTeer_Header *header;
+    LibTeer_Record *data_records;
+    size_t data_record_count;
+} LibTeer_FileData;
 
-typedef enum mode
-{
-    AUTO_COMPRESSION = 0,
-    NOCOMPRESS = 1,
-    GZIP = 2,
-    ZLIB = 2,
-    XZ = 3,
-    LZMA = 3,
-    BZIP2 = 4,
-    ZSTD = 5,
-    COMPRESSION_MODE_SIZE
-} LibTeer_Compression_Mode;
-
-typedef enum format
-{
-    AUTO_FORMAT = 0,
-    POSIX = 1,
-    USTAR = 2,
-    PAX = 3,
-    GNU = 4,
-    OLDGNU = 5,
-} LibTeer_File_Format;
+typedef struct archive {
+    LibTeer_File_Format format;
+    LibTeer_Compression_Mode compression_mode;
+    LibTeer_FileData *files;
+    size_t file_count;
+} LibTeer_Archive;
 
 // Functions
 
@@ -105,6 +133,7 @@ LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compressi
 
 /*
     Get a list of files in an archive.
+    The resulting LibTeer_Filelist has to be freed with 'free_directory_list(LibTeer_Filelist *list)'
     Returns 0 on success and anything else on failiure.
 */
 LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name);
