@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-int libTeer_xz_decompress(const char *infile, const char *outfile)
+int libTeer_xz_decompress_file(const char *infile, const char *outfile)
 {
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
@@ -128,7 +128,7 @@ int libTeer_xz_decompress(const char *infile, const char *outfile)
     return result;
 }
 
-int libTeer_xz_compress(const char *infile, const char *outfile, int compression_level)
+int libTeer_xz_compress_file(const char *infile, const char *outfile, int compression_level)
 {
     if (compression_level < 1 || compression_level > 9)
     {

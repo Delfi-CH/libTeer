@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int libTeer_bzip2_decompress(const char *infile, const char *outfile)
+int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 {
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
@@ -88,7 +88,7 @@ int libTeer_bzip2_decompress(const char *infile, const char *outfile)
     return result;
 }
 
-int libTeer_bzip2_compress(const char *infile, const char *outfile, int compression_level, int work_factor)
+int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int compression_level, int work_factor)
 {
     if (compression_level < 1 || compression_level > 9) {
         fprintf(stderr, "Compression level out of range! Use a value from %d to %d\n", 1, 9);

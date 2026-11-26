@@ -163,16 +163,16 @@ int libTeer_create(const char *directory, const char *output, LibTeer_Compressio
     case NOCOMPRESS:
         break;
     case GZIP:
-        rc = libTeer_gzip_compress(rand_filename, output);
+        rc = libTeer_gzip_compress_file(rand_filename, output);
         break;
     case XZ:
-        rc = libTeer_xz_compress(rand_filename, output, LIBTEER_DEFAULT_XZ_COMPRESSION_LEVEL);
+        rc = libTeer_xz_compress_file(rand_filename, output, LIBTEER_DEFAULT_XZ_COMPRESSION_LEVEL);
         break;
     case BZIP2:
-        rc = libTeer_bzip2_compress(rand_filename, output, LIBTEER_DEFAULT_BZIP2_COMPRESSION_LEVEL, LIBTEER_DEFAULT_BZIP2_WORK_FACTOR);
+        rc = libTeer_bzip2_compress_file(rand_filename, output, LIBTEER_DEFAULT_BZIP2_COMPRESSION_LEVEL, LIBTEER_DEFAULT_BZIP2_WORK_FACTOR);
         break;
     case ZSTD:
-        rc = libTeer_zstd_compress(rand_filename, output, LIBTEER_DEFAULT_ZSTD_COMPRESSION_LEVEL);
+        rc = libTeer_zstd_compress_file(rand_filename, output, LIBTEER_DEFAULT_ZSTD_COMPRESSION_LEVEL);
         break;
     case AUTO_COMPRESSION:
         rc = -2;

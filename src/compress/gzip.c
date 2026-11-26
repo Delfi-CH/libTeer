@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int libTeer_gzip_decompress(const char *infile, const char *outfile)
+int libTeer_gzip_decompress_file(const char *infile, const char *outfile)
 {
     gzFile in = gzopen(infile, "rb");
     if (in == NULL)
@@ -63,7 +63,7 @@ int libTeer_gzip_decompress(const char *infile, const char *outfile)
     return result;
 }
 
-int libTeer_gzip_compress(const char *infile, const char *outfile)
+int libTeer_gzip_compress_file(const char *infile, const char *outfile)
 {
     FILE *in = fopen(infile, "rb");
     if (in == NULL)

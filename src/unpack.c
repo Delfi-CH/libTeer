@@ -200,16 +200,16 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
     case NOCOMPRESS:
         break;
     case GZIP:
-        rc = libTeer_gzip_decompress(filename, rand_filename);
+        rc = libTeer_gzip_decompress_file(filename, rand_filename);
         break;
     case XZ:
-        rc = libTeer_xz_decompress(filename, rand_filename);
+        rc = libTeer_xz_decompress_file(filename, rand_filename);
         break;
     case BZIP2:
-        rc = libTeer_bzip2_decompress(filename, rand_filename);
+        rc = libTeer_bzip2_decompress_file(filename, rand_filename);
         break;
     case ZSTD:
-        rc = libTeer_zstd_decompress(filename, rand_filename);
+        rc = libTeer_zstd_decompress_file(filename, rand_filename);
         break;
     case AUTO_COMPRESSION:
         rc = -2;

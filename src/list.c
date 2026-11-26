@@ -92,19 +92,19 @@ LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compressi
     case NOCOMPRESS:
         return libTeer_basic_list_files(archive_name);
     case GZIP:
-        rc = libTeer_gzip_decompress(archive_name, rand_filename);
+        rc = libTeer_gzip_decompress_file(archive_name, rand_filename);
         if (rc != 0) return NULL;
         break;
     case XZ:
-        rc = libTeer_xz_decompress(archive_name, rand_filename);
+        rc = libTeer_xz_decompress_file(archive_name, rand_filename);
         if (rc != 0) return NULL;
         break;
     case BZIP2:
-        rc = libTeer_bzip2_decompress(archive_name, rand_filename);
+        rc = libTeer_bzip2_decompress_file(archive_name, rand_filename);
         if (rc != 0) return NULL;
         break;
     case ZSTD:
-        rc = libTeer_zstd_decompress(archive_name, rand_filename);
+        rc = libTeer_zstd_decompress_file(archive_name, rand_filename);
         if (rc != 0) return NULL;
         break;
     case AUTO_COMPRESSION:

@@ -1,30 +1,30 @@
 #include "../include/libTeer.h"
 #include "../include/libTeer/compress.h"
 
-int libTeer_gzip_decompress(const char *infile, const char *outfile) {
+int libTeer_gzip_decompress_file(const char *infile, const char *outfile) {
     return -2;
 }
-int libTeer_gzip_compress(const char *infile, const char *outfile) {
-    return -2;
-}
-
-int libTeer_xz_decompress(const char *infile, const char *outfile) {
-    return -2;
-}
-int libTeer_xz_compress(const char *infile, const char *outfile, int compression_level) {
+int libTeer_gzip_compress_file(const char *infile, const char *outfile) {
     return -2;
 }
 
-int libTeer_zstd_decompress(const char *infile, const char *outfile) {
+int libTeer_xz_decompress_file(const char *infile, const char *outfile) {
     return -2;
 }
-int libTeer_zstd_compress(const char *infile, const char *outfile, int compression_level) {
+int libTeer_xz_compress_file(const char *infile, const char *outfile, int compression_level) {
     return -2;
 }
 
-int libTeer_bzip2_decompress(const char *infile, const char *outfile) {
+int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
     return -2;
 }
-int libTeer_bzip2_compress(const char *infile, const char *outfile, int compression_level, int work_factor) {
+int libTeer_zstd_compress_file(const char *infile, const char *outfile, int compression_level) {
+    return -2;
+}
+
+int libTeer_bzip2_decompress_file(const char *infile, const char *outfile) {
+    return -2;
+}
+int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int compression_level, int work_factor) {
     return -2;
 }

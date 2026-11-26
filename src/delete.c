@@ -209,16 +209,16 @@ int libTeer_delete(const char *archive_name, const char *filename, LibTeer_Compr
     case NOCOMPRESS:
         break;
     case GZIP:
-        rc = libTeer_gzip_decompress(archive_name, rand_filename);
+        rc = libTeer_gzip_decompress_file(archive_name, rand_filename);
         break;
     case XZ:
-        rc = libTeer_xz_decompress(archive_name, rand_filename);
+        rc = libTeer_xz_decompress_file(archive_name, rand_filename);
         break;
     case BZIP2:
-        rc = libTeer_bzip2_decompress(archive_name, rand_filename);
+        rc = libTeer_bzip2_decompress_file(archive_name, rand_filename);
         break;
     case ZSTD:
-        rc = libTeer_zstd_decompress(archive_name, rand_filename);
+        rc = libTeer_zstd_decompress_file(archive_name, rand_filename);
         break;
     case AUTO_COMPRESSION:
         rc = -2;
@@ -254,16 +254,16 @@ int libTeer_delete(const char *archive_name, const char *filename, LibTeer_Compr
     case NOCOMPRESS:
         break;
     case GZIP:
-        rc = libTeer_gzip_compress(rand_filename, archive_name);
+        rc = libTeer_gzip_compress_file(rand_filename, archive_name);
         break;
     case XZ:
-        rc = libTeer_xz_compress(rand_filename, archive_name, LIBTEER_DEFAULT_XZ_COMPRESSION_LEVEL);
+        rc = libTeer_xz_compress_file(rand_filename, archive_name, LIBTEER_DEFAULT_XZ_COMPRESSION_LEVEL);
         break;
     case BZIP2:
-        rc = libTeer_bzip2_compress(rand_filename, archive_name, LIBTEER_DEFAULT_BZIP2_COMPRESSION_LEVEL, LIBTEER_DEFAULT_BZIP2_WORK_FACTOR);
+        rc = libTeer_bzip2_compress_file(rand_filename, archive_name, LIBTEER_DEFAULT_BZIP2_COMPRESSION_LEVEL, LIBTEER_DEFAULT_BZIP2_WORK_FACTOR);
         break;
     case ZSTD:
-        rc = libTeer_zstd_compress(rand_filename, archive_name, LIBTEER_DEFAULT_ZSTD_COMPRESSION_LEVEL);
+        rc = libTeer_zstd_compress_file(rand_filename, archive_name, LIBTEER_DEFAULT_ZSTD_COMPRESSION_LEVEL);
         break;
     case AUTO_COMPRESSION:
         rc = -2;

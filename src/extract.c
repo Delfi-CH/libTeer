@@ -170,16 +170,16 @@ int libTeer_filextract(const char *archive_name, const char *filename, const cha
     case NOCOMPRESS:
         break;
     case GZIP:
-        rc = libTeer_gzip_decompress(archive_name, rand_filename);
+        rc = libTeer_gzip_decompress_file(archive_name, rand_filename);
         break;
     case XZ:
-        rc = libTeer_xz_decompress(archive_name, rand_filename);
+        rc = libTeer_xz_decompress_file(archive_name, rand_filename);
         break;
     case BZIP2:
-        rc = libTeer_bzip2_decompress(archive_name, rand_filename);
+        rc = libTeer_bzip2_decompress_file(archive_name, rand_filename);
         break;
     case ZSTD:
-        rc = libTeer_zstd_decompress(archive_name, rand_filename);
+        rc = libTeer_zstd_decompress_file(archive_name, rand_filename);
         break;
     case AUTO_COMPRESSION:
         rc = -2;
