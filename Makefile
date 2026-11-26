@@ -119,30 +119,6 @@ else
 	OBJ = $(CORE_OBJ)
 endif 
 
-TEST_UNPACK_SRC=$(TESTDIR)/test_unpack.c 
-TEST_UNPACK_OBJ=test_unpack
-
-TEST_MERGE_SRC=$(TESTDIR)/test_merge.c 
-TEST_MERGE_OBJ=test_merge
-
-TEST_APPEND_SRC=$(TESTDIR)/test_append.c 
-TEST_APPEND_OBJ=test_append
-
-TEST_CREATE_SRC=$(TESTDIR)/test_create.c 
-TEST_CREATE_OBJ=test_create
-
-TEST_LIST_SRC=$(TESTDIR)/test_list.c 
-TEST_LIST_OBJ=test_list
-
-TEST_EXTRACT_SRC=$(TESTDIR)/test_extract.c 
-TEST_EXTRACT_OBJ=test_extract
-
-TEST_DELETE_SRC=$(TESTDIR)/test_delete.c 
-TEST_DELETE_OBJ=test_delete
-
-TEST_VERSION_SRC=$(TESTDIR)/test_version.c 
-TEST_VERSION_OBJ=test_version
-
 BZIP2_SRC = bzip2-1.0.8
 BZIP2_OBJ = $(BZIP2_SRC)/libbz2.a
 BZIP2_ARCHIVE = bzip2-1.0.8.tar.gz
@@ -334,9 +310,9 @@ $(ZSTD_ARCHIVE):
 clean:
 	rm -rf $(BUILDDIR) $(BZIP2_ARCHIVE) $(BZIP2_SRC) $(ZLIB_ARCHIVE) $(ZLIB_SRC) $(LZMA_ARCHIVE) $(LZMA_SRC) $(ZSTD_ARCHIVE) $(ZSTD_SRC) *.exe *.a *.o *.so *.dll $(THIRDPARTY_DIR) test_* *.tar* *.def
 
-.PHONY: test
+.PHONY: test-prepare
 
-test: all $(TEST_SRC)
+test-prepare:
 	tar cf $(DEMOTAR) $(FOODIR)
 	tar cf $(SRCDIR).tar $(SRCDIR)
 	tar cf $(SRCDIR)2.tar $(SRCDIR)
@@ -345,83 +321,39 @@ test: all $(TEST_SRC)
 	tar cjf $(DEMOTAR).bz2 $(FOODIR)
 	tar cJf $(DEMOTAR).xz $(FOODIR)
 ifeq ($(PLATFORM), windows)
-ifeq ($(OUTPUT), static)
-	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ).exe
-	wine $(TEST_UNPACK_OBJ).exe
-	$(CC) $(TEST_MERGE_SRC) $(PRODUCT) -o $(TEST_MERGE_OBJ).exe
-	wine $(TEST_MERGE_OBJ).exe
-	$(CC) $(TEST_APPEND_SRC) $(PRODUCT) -o $(TEST_APPEND_OBJ).exe
-	wine $(TEST_APPEND_OBJ).exe
-	$(CC) $(TEST_CREATE_SRC) $(PRODUCT) -o $(TEST_CREATE_OBJ).exe
-	wine $(TEST_CREATE_OBJ).exe
-	$(CC) $(TEST_LIST_SRC) $(PRODUCT) -o $(TEST_LIST_OBJ).exe
-	wine $(TEST_LIST_OBJ).exe
-	$(CC) $(TEST_EXTRACT_SRC) $(PRODUCT) -o $(TEST_EXTRACT_OBJ).exe
-	wine $(TEST_EXTRACT_OBJ).exe
-	$(CC) $(TEST_DELETE_SRC) $(PRODUCT) -o $(TEST_DELETE_OBJ).exe
-	wine $(TEST_DELETE_OBJ).exe
-	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ).exe
-	wine $(TEST_VERSION_OBJ).exe
-else
+ifeq ($(OUTPUT), shared)
 # temporarly copy over required dlls from /usr/x86_64-w64-mingw32/bin
 	cp /usr/x86_64-w64-mingw32/bin/libssp-0.dll .
 	cp /usr/x86_64-w64-mingw32/bin/libbz2-1.dll .
 	cp /usr/x86_64-w64-mingw32/bin/zlib1.dll .
 	cp /usr/x86_64-w64-mingw32/bin/liblzma-5.dll .
 	cp /usr/x86_64-w64-mingw32/bin/libzstd.dll .
-	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ).exe
-	wine $(TEST_UNPACK_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_MERGE_SRC) -L$(PWD) -lTeer -o $(TEST_MERGE_OBJ).exe
-	wine $(TEST_MERGE_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_APPEND_SRC) -L$(PWD) -lTeer -o $(TEST_APPEND_OBJ).exe
-	wine $(TEST_APPEND_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_CREATE_SRC) -L$(PWD) -lTeer -o $(TEST_CREATE_OBJ).exe
-	wine $(TEST_CREATE_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_LIST_SRC) -L$(PWD) -lTeer -o $(TEST_LIST_OBJ).exe
-	wine $(TEST_LIST_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_EXTRACT_SRC) -L$(PWD) -lTeer -o $(TEST_EXTRACT_OBJ).exe
-	wine $(TEST_EXTRACT_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_DELETE_SRC) -L$(PWD) -lTeer -o $(TEST_DELETE_OBJ).exe
-	wine $(TEST_DELETE_OBJ).exe
-	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ).exe
-	wine $(TEST_VERSION_OBJ).exe
 endif
 else
-ifeq ($(OUTPUT), static)
-	$(CC) $(TEST_UNPACK_SRC) $(PRODUCT) -o $(TEST_UNPACK_OBJ)
-	./$(TEST_UNPACK_OBJ)
-	$(CC) $(TEST_MERGE_SRC) $(PRODUCT) -o $(TEST_MERGE_OBJ)
-	./$(TEST_MERGE_OBJ)
-	$(CC) $(TEST_APPEND_SRC) $(PRODUCT) -o $(TEST_APPEND_OBJ)
-	./$(TEST_APPEND_OBJ)
-	$(CC) $(TEST_CREATE_SRC) $(PRODUCT) -o $(TEST_CREATE_OBJ)
-	./$(TEST_CREATE_OBJ)
-	$(CC) $(TEST_LIST_SRC) $(PRODUCT) -o $(TEST_LIST_OBJ)
-	./$(TEST_LIST_OBJ)
-	$(CC) $(TEST_EXTRACT_SRC) $(PRODUCT) -o $(TEST_EXTRACT_OBJ)
-	./$(TEST_EXTRACT_OBJ)
-	$(CC) $(TEST_DELETE_SRC) $(PRODUCT) -o $(TEST_DELETE_OBJ)
-	./$(TEST_DELETE_OBJ)
-	$(CC) $(TEST_VERSION_SRC) $(PRODUCT) -o $(TEST_VERSION_OBJ)
-	./$(TEST_VERSION_OBJ)
-else
-	$(CC) $(CFLAGS) $(TEST_UNPACK_SRC) -L$(PWD) -lTeer -o $(TEST_UNPACK_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_UNPACK_OBJ)
-	$(CC) $(CFLAGS) $(TEST_MERGE_SRC) -L$(PWD) -lTeer -o $(TEST_MERGE_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_MERGE_OBJ)
-	$(CC) $(CFLAGS) $(TEST_APPEND_SRC) -L$(PWD) -lTeer -o $(TEST_APPEND_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_APPEND_OBJ)
-	$(CC) $(CFLAGS) $(TEST_CREATE_SRC) -L$(PWD) -lTeer -o $(TEST_CREATE_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_CREATE_OBJ)
-	$(CC) $(CFLAGS) $(TEST_LIST_SRC) -L$(PWD) -lTeer -o $(TEST_LIST_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_LIST_OBJ)
-	$(CC) $(CFLAGS) $(TEST_EXTRACT_SRC) -L$(PWD) -lTeer -o $(TEST_EXTRACT_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_EXTRACT_OBJ)
-	$(CC) $(CFLAGS) $(TEST_DELETE_SRC) -L$(PWD) -lTeer -o $(TEST_DELETE_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_DELETE_OBJ)
-	$(CC) $(CFLAGS) $(TEST_VERSION_SRC) -L$(PWD) -lTeer -o $(TEST_VERSION_OBJ)
-	LD_LIBRARY_PATH=$(PWD) ./$(TEST_VERSION_OBJ)
+
 endif
+
+
+ifeq ($(PLATFORM), windows)
+test_%.exe: $(TESTDIR)/test_%.c
+else
+test_%: $(TESTDIR)/test_%.c
+endif
+ifeq ($(OUTPUT), shared)
+	$(CC) $(CFLAGS) $(PRODUCT) -L$(PWD) -lTeer $< -o $@
+else
+	$(CC) $(CFLAGS) $< -o $@
+endif
+
+TEST_SRC = $(wildcard $(TESTDIR)/test_*.c)
+TEST_BIN = $(patsubst $(TESTDIR)/%.c,%,$(TEST_SRC))
+
+.PHONY: test
+test: all test-prepare $(TEST_BIN)
+ifeq ($(PLATFORM), windows)
+	@for t in $(TEST_BIN); do wine $$t.exe || exit $$?; done
+else
+	@for t in $(TEST_BIN); do LD_LIBRARY_PATH=$(PWD) ./$$t || exit $$?; done
 endif
 
 PREFIX ?= /usr
