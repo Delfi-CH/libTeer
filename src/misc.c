@@ -1,6 +1,7 @@
 #define _XOPEN_SOURCE 500
 
 #include "../include/libTeer/private.h"
+#include "../include/libTeer/compress.h"
 #include "../include/libTeer.h"
 #include <stdlib.h>
 #include <stddef.h>
@@ -41,4 +42,11 @@ void rand_str(char *dest, size_t length)
 char *libTeer_get_version()
 {
     return LIBTEER_VERSION_STRING;
+}
+
+void free_decompressed_buffer(struct decompressed_buffer *buffer) {
+    if (buffer == NULL) return;
+    free(buffer->data);
+    free(buffer);
+    return;
 }

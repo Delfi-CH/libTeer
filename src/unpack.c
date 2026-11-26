@@ -82,11 +82,12 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
             if (path[strlen(header->file_path) - 1] == '/')
             {
                 struct stat path_st;
-                stat(path, &path_st);
-                if (S_ISDIR(path_st.st_mode)) {
-                    free(buf);
-                    continue;
-                } else {
+                if (stat(path, &path_st) == 0) {
+                    if (S_ISDIR(path_st.st_mode)) {
+                        free(buf);
+                        continue;
+                    }
+                }
                     #ifdef _WIN32
                     if(mkdir(path)) {
                         fclose(tarball);
@@ -106,7 +107,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                         return 1;
                     };
                     #endif
-                }
+                
             } else {
                 if (current_file != NULL) {
                     if(fclose(current_file)) {
@@ -129,7 +130,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 current_file = fopen(current_filename, "wb");
                 if (current_file == NULL) {
                     fclose(tarball);
-                    eprintf("Failed to open file %s", current_filename);
+                    eprintf("Failed to open file %s/%s\n", directory, current_filename);
                     free(initial_working_directory);
                     free(buf);
                     free(header);

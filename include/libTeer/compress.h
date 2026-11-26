@@ -7,12 +7,24 @@
 #ifndef LIBTEER_COMPRESS_H
 #define LIBTEER_COMPRESS_H
 
+// Structs
+
+struct decompressed_buffer {
+    char *data;
+    size_t lentgh;
+};
+
 // Functions
 
 /*
 decompresses infile to outfile.
 */
 int libTeer_bzip2_decompress_file(const char *infile, const char *outfile);
+
+/*
+decompresses filename, returns decompressed buffer or NULL on error.
+*/
+struct decompressed_buffer *libTeer_bzip2_decompress_buffer(const char *filename);
 
 /*
 compresses infile to outfile.
@@ -48,5 +60,7 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile);
 compresses infile to outfile.
 */
 int libTeer_zstd_compress_file(const char *infile, const char *outfile, int compression_level);
+
+void free_decompressed_buffer(struct decompressed_buffer *buffer);
 
 #endif

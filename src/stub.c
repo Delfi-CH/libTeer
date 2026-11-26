@@ -28,3 +28,6 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile) {
 int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int compression_level, int work_factor) {
     return -2;
 }
+struct decompressed_buffer *libTeer_bzip2_decompress_buffer(const char *filename) {
+    return NULL;
+}

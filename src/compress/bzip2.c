@@ -3,6 +3,7 @@
 #include "../../include/libTeer/private.h"
 #include <bzlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 const size_t BUFFER_SIZE = 512;
@@ -12,14 +13,14 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        eprintf( "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        eprintf( "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -31,7 +32,7 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 
     if (bzerr != BZ_OK)
     {
-        eprintf( "Error opening bzip file: %d\n", bzerr);
+        eprintf("Error opening bzip file: %d\n", bzerr);
         fclose(in);
         fclose(out);
         return 1;
@@ -45,7 +46,7 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
         size_t written = fwrite(buf, 1, (size_t)read, out);
         if (written != (size_t)read)
         {
-            eprintf( "fwrite failed\n");
+            eprintf("fwrite failed\n");
             result = 1;
         }
         if (bzerr != BZ_STREAM_END)
@@ -54,7 +55,7 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
         }
         if (bzerr != BZ_OK)
         {
-            eprintf( "Error reading from bzip file: %d\n", bzerr);
+            eprintf("Error reading from bzip file: %d\n", bzerr);
             result = 1;
         }
 
@@ -66,19 +67,19 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
     BZ2_bzReadClose(&bzerr, bz);
     if (bzerr != BZ_OK)
     {
-        eprintf( "Error closing bzip file: %d\n", bzerr);
+        eprintf("Error closing bzip file: %d\n", bzerr);
         result = 1;
     }
 
     if (fclose(in) != 0)
     {
-        eprintf( "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        eprintf( "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 
@@ -93,24 +94,24 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int compression_level, int work_factor)
 {
     if (compression_level < 1 || compression_level > 9) {
-        eprintf( "Compression level out of range! Use a value from %d to %d\n", 1, 9);
+        eprintf("Compression level out of range! Use a value from %d to %d\n", 1, 9);
         return -1;
     }
     if (work_factor < 1 || work_factor > 250) {
-        eprintf( "Work factor out of range! Use a value from %d to %d\n", 1, 250);
+        eprintf("Work factor out of range! Use a value from %d to %d\n", 1, 250);
         return -1;
     }
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        eprintf( "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        eprintf( "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -122,7 +123,7 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
 
     if (bzerr != BZ_OK)
     {
-        eprintf( "Error opening bzip file: %d\n", bzerr);
+        eprintf("Error opening bzip file: %d\n", bzerr);
         fclose(in);
         fclose(out);
         return 1;
@@ -136,7 +137,7 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
         BZ2_bzWrite(&bzerr, bz, buf, (int)read);
         if (bzerr != BZ_OK)
         {
-            eprintf( "Error reading from bzip file: %d\n", bzerr);
+            eprintf("Error reading from bzip file: %d\n", bzerr);
             result = 1;
         }
 
@@ -152,19 +153,19 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
 
     if (bzerr != BZ_OK)
     {
-        eprintf( "Error closing bzip file: %d\n", bzerr);
+        eprintf("Error closing bzip file: %d\n", bzerr);
         result = 1;
     }
 
     if (fclose(in) != 0)
     {
-        eprintf( "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        eprintf( "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 
@@ -174,4 +175,85 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
     }
 
     return result;
+}
+
+
+struct decompressed_buffer *libTeer_bzip2_decompress_buffer(const char *filename) {
+    if (filename == NULL) {
+        return NULL;
+    }
+
+    FILE *f = fopen(filename, "rb");
+    if (f == NULL) {
+        eprintf("Failed to open file %s!\n", filename);
+        return NULL;
+    }
+
+    int bzerr = 0;
+    BZFILE *bz = BZ2_bzReadOpen(&bzerr, f, 0, 0, NULL, 0);
+    if (bzerr != BZ_OK)
+    {
+        eprintf("Error opening bzip file: %d\n", bzerr);
+        fclose(f);
+        return NULL;
+    }
+
+    size_t data_length = 1;
+    char *data = malloc(data_length * sizeof(char));
+    if (data == NULL) {
+        eprintf("Failed to allocate memory!\n");
+        fclose(f);
+        return NULL;
+    }
+    char buf[BUFFER_SIZE];
+    size_t read;
+
+    bool error = false;
+
+    while ((read = BZ2_bzRead(&bzerr, bz, buf, sizeof(buf))) > 0) {
+        if (bzerr == BZ_STREAM_END)
+        {
+            break;
+        }
+        if (bzerr != BZ_OK)
+        {
+            eprintf("Error reading from bzip file: %d\n", bzerr);
+            error = true;
+            break;
+        }
+        char *tmpbuf = realloc(data, data_length + read);
+        if (tmpbuf == NULL) {
+            eprintf("Failed to allocate memory!\n");
+            error = true;
+            break;
+        }
+        data = tmpbuf;
+        memcpy(data + data_length, buf, read);
+        data_length += read;
+    }
+
+    BZ2_bzReadClose(&bzerr, bz);
+    if (bzerr != BZ_OK)
+    {
+        eprintf("Error closing bzip file: %d\n", bzerr);
+        free(data);
+        fclose(f);
+        return NULL;
+    }
+
+    fclose(f);
+
+    if (error) {
+        free(data);
+        return NULL;
+    }
+    struct decompressed_buffer *dbuf = malloc(sizeof(struct decompressed_buffer));
+    if (dbuf == NULL) {
+        eprintf("Failed to allocate memory!\n");
+        free(data);
+        return NULL;
+    }
+    dbuf->data = data;
+    dbuf->lentgh = data_length;
+    return dbuf;
 }
