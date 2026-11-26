@@ -10,21 +10,21 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
 
     ZSTD_DStream *stream = ZSTD_createDStream();
     if (stream == NULL) {
-        fprintf(stderr, "Failed to create zdstream \n");
+        eprintf("Failed to create zdstream \n");
         fclose(in);
         fclose(out);
         return 1;
@@ -32,7 +32,7 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
 
     size_t ret = ZSTD_initDStream(stream);
     if (ZSTD_isError(ret)) {
-        fprintf(stderr, "ZSTD_initDStream: %s\n", ZSTD_getErrorName(ret));
+        eprintf("ZSTD_initDStream: %s\n", ZSTD_getErrorName(ret));
         ZSTD_freeDStream(stream);
         fclose(in);
         fclose(out);
@@ -54,13 +54,13 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
             remaining = ZSTD_decompressStream(stream, &output, &input);
 
             if (ZSTD_isError(remaining)) {
-                fprintf(stderr, "Decompression error: %s\n", ZSTD_getErrorName(remaining));
+                eprintf("Decompression error: %s\n", ZSTD_getErrorName(remaining));
                 result = 1;
                 break;
             }
 
             if (fwrite(out_buf, 1, output.pos, out) != output.pos) {
-                fprintf(stderr, "Writing failed\n");
+                eprintf("Writing failed\n");
                 result = 1;
                 break;
             }
@@ -68,7 +68,7 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
             if (output.pos == 0 &&
                 input.pos == 0 &&
                 input.size > 0) {
-                fprintf(stderr, "Decompression stalled\n");
+                eprintf("Decompression stalled\n");
                 result = 1;
                 break;
             }
@@ -80,7 +80,7 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
     }
 
     if (!result && remaining != 0) {
-        fprintf(stderr, "Incomplete or truncated zstd frame\n");
+        eprintf("Incomplete or truncated zstd frame\n");
         result = 1;
     }
 
@@ -88,13 +88,13 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 
@@ -107,28 +107,28 @@ int libTeer_zstd_decompress_file(const char *infile, const char *outfile) {
 
 int libTeer_zstd_compress_file(const char *infile, const char *outfile, int compression_level) {
     if (compression_level < ZSTD_minCLevel() || compression_level > ZSTD_maxCLevel()) {
-        fprintf(stderr, "Compression level out of bounds! Use a value from %d to %d\n", ZSTD_minCLevel(), ZSTD_maxCLevel());
+        eprintf("Compression level out of bounds! Use a value from %d to %d\n", ZSTD_minCLevel(), ZSTD_maxCLevel());
         return -1;
     }
 
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
 
     ZSTD_CStream *stream = ZSTD_createCStream();
     if (stream == NULL) {
-        fprintf(stderr, "Failed to create zdstream \n");
+        eprintf("Failed to create zdstream \n");
         fclose(in);
         fclose(out);
         return 1;
@@ -136,7 +136,7 @@ int libTeer_zstd_compress_file(const char *infile, const char *outfile, int comp
 
     size_t ret = ZSTD_initCStream(stream, compression_level);
     if (ZSTD_isError(ret)) {
-        fprintf(stderr, "ZSTD_initDStream: %s\n", ZSTD_getErrorName(ret));
+        eprintf("ZSTD_initDStream: %s\n", ZSTD_getErrorName(ret));
         ZSTD_freeCStream(stream);
         fclose(in);
         fclose(out);
@@ -158,13 +158,13 @@ int libTeer_zstd_compress_file(const char *infile, const char *outfile, int comp
             remaining = ZSTD_compressStream2(stream, &output, &input, ZSTD_e_continue);
 
             if (ZSTD_isError(remaining)) {
-                fprintf(stderr, "Compression error: %s\n", ZSTD_getErrorName(remaining));
+                eprintf("Compression error: %s\n", ZSTD_getErrorName(remaining));
                 result = 1;
                 break;
             }
 
             if (fwrite(out_buf, 1, output.pos, out) != output.pos) {
-                fprintf(stderr, "Writing failed\n");
+                eprintf("Writing failed\n");
                 result = 1;
                 break;
             }
@@ -172,7 +172,7 @@ int libTeer_zstd_compress_file(const char *infile, const char *outfile, int comp
             if (output.pos == 0 &&
                 input.pos == 0 &&
                 input.size > 0) {
-                fprintf(stderr, "Compression stalled\n");
+                eprintf("Compression stalled\n");
                 result = 1;
                 break;
             }
@@ -184,7 +184,7 @@ int libTeer_zstd_compress_file(const char *infile, const char *outfile, int comp
     }
 
     if (!result && remaining != 0) {
-        fprintf(stderr, "Incomplete or truncated zstd frame\n");
+        eprintf("Incomplete or truncated zstd frame\n");
         result = 1;
     }
 
@@ -199,14 +199,14 @@ int libTeer_zstd_compress_file(const char *infile, const char *outfile, int comp
                 stream, &output, &input, ZSTD_e_end);
 
             if (ZSTD_isError(remaining)) {
-                fprintf(stderr, "Compression finalization error: %s\n",
+                eprintf("Compression finalization error: %s\n",
                         ZSTD_getErrorName(remaining));
                 result = 1;
                 break;
             }
 
             if (fwrite(out_buf, 1, output.pos, out) != output.pos) {
-                fprintf(stderr, "Writing failed during finalization\n");
+                eprintf("Writing failed during finalization\n");
                 result = 1;
                 break;
             }
@@ -217,13 +217,13 @@ int libTeer_zstd_compress_file(const char *infile, const char *outfile, int comp
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 

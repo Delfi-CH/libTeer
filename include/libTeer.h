@@ -12,6 +12,11 @@
 // Includes
 
 #include <stddef.h>
+#include <stdio.h>
+
+// macros
+
+#define eprintf(...) fprintf(stderr, __VA_ARGS__)
 
 // Enums
 

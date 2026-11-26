@@ -8,7 +8,7 @@ char *read_single_record(FILE *tarball)
     char *buffer = malloc(LIBTEER_RECORD_LENGTH * sizeof(char));
     if (buffer == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory!\n");
+        eprintf("Failed to allocate memory!\n");
         return NULL;
     }
     for (int i = 0; i < LIBTEER_RECORD_LENGTH; i++)

@@ -9,18 +9,18 @@
 
 int libTeer_basic_filextract(const char *archive_name, const char *filename, const char *outdir) {
     if (filename == NULL) {
-        fprintf(stderr, "Filename is null! Aborting...\n");
+        eprintf("Filename is null! Aborting...\n");
         return 1;
     }
     if (archive_name == NULL) {
-        fprintf(stderr, "Archive name is null! Aborting...\n");
+        eprintf("Archive name is null! Aborting...\n");
         return 1;
     }
 
     char *outfname = NULL;
     char *tmpdup = strdup(filename);
     if (tmpdup == NULL) {
-            fprintf(stderr, "Failed to allocate memory!\n");
+            eprintf("Failed to allocate memory!\n");
             return 1;
         }
     char *basefname = basename(tmpdup);
@@ -28,14 +28,14 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
     if (outdir == NULL) {
         outfname = strdup(filename);
         if (outfname == NULL) {
-            fprintf(stderr, "Failed to allocate memory!\n");
+            eprintf("Failed to allocate memory!\n");
             free(tmpdup);
             return 1;
         }
     } else {
         outfname = calloc((strlen(filename) + strlen(outdir) + 2), sizeof(char));
         if (outfname == NULL) {
-            fprintf(stderr, "Failed to allocate memory!\n");
+            eprintf("Failed to allocate memory!\n");
             free(tmpdup);
             return 1;
         }
@@ -45,7 +45,7 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
     struct stat st;
     if (stat(archive_name, &st))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", archive_name);
+        eprintf("Failed to stat file %s!\n", archive_name);
         free(tmpdup);
         free(outfname);
         return 1;
@@ -53,7 +53,7 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
 
     if (st.st_size % LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", archive_name, LIBTEER_RECORD_LENGTH);
+        eprintf("Not a tar file %s, filelength not divisible by %d!\n", archive_name, LIBTEER_RECORD_LENGTH);
         free(tmpdup);
         free(outfname);
         return 1;
@@ -61,7 +61,7 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
 
     FILE *archive = fopen(archive_name, "rb");
     if (archive == NULL) {
-        fprintf(stderr, "Failed to open file %s!\n", archive_name);
+        eprintf("Failed to open file %s!\n", archive_name);
         free(tmpdup);
         free(outfname);
         return 1;   
@@ -73,7 +73,7 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
     for (int i = 0; i < st.st_size / LIBTEER_RECORD_LENGTH; i++) {
         char *buf = read_single_record(archive);
         if (buf == NULL) {
-            fprintf(stderr, "Failed to read buffer from %s!\n", archive_name);
+            eprintf("Failed to read buffer from %s!\n", archive_name);
             fclose(archive);
             free(tmpdup);
             free(outfname);
@@ -108,7 +108,7 @@ int libTeer_basic_filextract(const char *archive_name, const char *filename, con
                 is_target_record = true;
                 outfile = fopen(outfname, "wb");
                 if (outfile == NULL) {
-                    fprintf(stderr, "Failed to create file %s!\n", outfname);
+                    eprintf("Failed to create file %s!\n", outfname);
                     free(buf);
                     free(header);
                     free(tmpdup);
@@ -134,7 +134,7 @@ int libTeer_filextract(const char *archive_name, const char *filename, const cha
     LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE)
     {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
+        eprintf("Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;
         return rc;
     }
@@ -159,7 +159,7 @@ int libTeer_filextract(const char *archive_name, const char *filename, const cha
     rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return 1;
     }
 
@@ -183,11 +183,11 @@ int libTeer_filextract(const char *archive_name, const char *filename, const cha
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
     if (rc != 0)

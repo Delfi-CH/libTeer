@@ -60,20 +60,20 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     LibTeer_UStarHeader *header = calloc(1, sizeof(LibTeer_UStarHeader));
     if (header == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory!\n");
+        eprintf("Failed to allocate memory!\n");
         return NULL;
     }
     struct stat st;
     if (stat(filename, &st))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", filename);
+        eprintf("Failed to stat file %s!\n", filename);
         free(header);
         return NULL;
     }
     struct ustar_filebuf *filebuf = malloc(sizeof(struct ustar_filebuf));
     if (filebuf == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory!\n");
+        eprintf("Failed to allocate memory!\n");
         free(header);
         return NULL;
     }
@@ -94,7 +94,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         memmove(dupfilename, dupfilename + prefix_len + 1, strlen(dupfilename) - prefix_len);
         if (strlen(dupfilename) > 99)
         {
-            fprintf(stderr, "Filename %s cannot be split!\n", filename);
+            eprintf("Filename %s cannot be split!\n", filename);
             free(dupfilename);
             free(prefix_end);
             free(filebuf);
@@ -108,7 +108,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
     }
     else
     {
-        fprintf(stderr, "Filename %s is longer than 255 characters!\n", filename);
+        eprintf("Filename %s is longer than 255 characters!\n", filename);
         free(header);
         free(filebuf);
         return NULL;
@@ -146,7 +146,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
 
     if (result != ERROR_SUCCESS)
     {
-        fprintf(stderr, "Failed to aquire security information: %lu\n", result);
+        eprintf("Failed to aquire security information: %lu\n", result);
         free(header);
         free(filebuf);
         return NULL;
@@ -179,7 +179,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         }
         else
         {
-            fprintf(stderr, "%s: Failed to lookup account information (%lu)\n",
+            eprintf("%s: Failed to lookup account information (%lu)\n",
                     labels[i], GetLastError());
         }
     }
@@ -229,7 +229,7 @@ struct ustar_filebuf *file_to_ustar_buffer(const char *filename)
         FILE *file = fopen(filename, "rb");
         if (file == NULL)
         {
-            fprintf(stderr, "Failed to open file %s!\n", filename);
+            eprintf("Failed to open file %s!\n", filename);
             free(filebuf);
             free(header);
             free(records);
@@ -280,27 +280,27 @@ struct ustar_headerlist *get_ustar_headers_of_file(const char *filename)
     struct stat st;
     if (stat(filename, &st))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", filename);
+        eprintf("Failed to stat file %s!\n", filename);
         return NULL;
     }
 
     if (st.st_size % LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", filename, LIBTEER_RECORD_LENGTH);
+        eprintf("Not a tar file %s, filelength not divisible by %d!\n", filename, LIBTEER_RECORD_LENGTH);
         return NULL;
     }
 
     LibTeer_UStarHeader **headers = malloc(sizeof(LibTeer_UStarHeader *));
     if (headers == NULL)
     {
-        fprintf(stderr, "Failed to allocate memory!\n");
+        eprintf("Failed to allocate memory!\n");
         return NULL;
     }
 
     FILE *file = fopen(filename, "rb");
     if (file == NULL)
     {
-        fprintf(stderr, "Failed to open %s!\n", filename);
+        eprintf("Failed to open %s!\n", filename);
         free(headers);
         return NULL;
     }
@@ -359,7 +359,7 @@ struct ustar_headerlist *get_ustar_headers_of_file(const char *filename)
 
     struct ustar_headerlist *list = malloc(sizeof(struct ustar_headerlist));
     if (list == NULL) {
-        fprintf(stderr, "Failed to allocate memory!\n");
+        eprintf("Failed to allocate memory!\n");
         return NULL;
     }
     list->length = count;

@@ -5,19 +5,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const size_t BUFFER_SIZE = 512;
+
 int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 {
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf( "Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf( "Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -29,7 +31,7 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 
     if (bzerr != BZ_OK)
     {
-        fprintf(stderr, "Error opening bzip file: %d\n", bzerr);
+        eprintf( "Error opening bzip file: %d\n", bzerr);
         fclose(in);
         fclose(out);
         return 1;
@@ -43,7 +45,7 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
         size_t written = fwrite(buf, 1, (size_t)read, out);
         if (written != (size_t)read)
         {
-            fprintf(stderr, "fwrite failed\n");
+            eprintf( "fwrite failed\n");
             result = 1;
         }
         if (bzerr != BZ_STREAM_END)
@@ -52,7 +54,7 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
         }
         if (bzerr != BZ_OK)
         {
-            fprintf(stderr, "Error reading from bzip file: %d\n", bzerr);
+            eprintf( "Error reading from bzip file: %d\n", bzerr);
             result = 1;
         }
 
@@ -64,19 +66,19 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
     BZ2_bzReadClose(&bzerr, bz);
     if (bzerr != BZ_OK)
     {
-        fprintf(stderr, "Error closing bzip file: %d\n", bzerr);
+        eprintf( "Error closing bzip file: %d\n", bzerr);
         result = 1;
     }
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf( "Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf( "Failed to close output file %s\n", outfile);
         result = 1;
     }
 
@@ -91,24 +93,24 @@ int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int compression_level, int work_factor)
 {
     if (compression_level < 1 || compression_level > 9) {
-        fprintf(stderr, "Compression level out of range! Use a value from %d to %d\n", 1, 9);
+        eprintf( "Compression level out of range! Use a value from %d to %d\n", 1, 9);
         return -1;
     }
     if (work_factor < 1 || work_factor > 250) {
-        fprintf(stderr, "Work factor out of range! Use a value from %d to %d\n", 1, 250);
+        eprintf( "Work factor out of range! Use a value from %d to %d\n", 1, 250);
         return -1;
     }
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf( "Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf( "Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -120,7 +122,7 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
 
     if (bzerr != BZ_OK)
     {
-        fprintf(stderr, "Error opening bzip file: %d\n", bzerr);
+        eprintf( "Error opening bzip file: %d\n", bzerr);
         fclose(in);
         fclose(out);
         return 1;
@@ -134,7 +136,7 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
         BZ2_bzWrite(&bzerr, bz, buf, (int)read);
         if (bzerr != BZ_OK)
         {
-            fprintf(stderr, "Error reading from bzip file: %d\n", bzerr);
+            eprintf( "Error reading from bzip file: %d\n", bzerr);
             result = 1;
         }
 
@@ -150,19 +152,19 @@ int libTeer_bzip2_compress_file(const char *infile, const char *outfile, int com
 
     if (bzerr != BZ_OK)
     {
-        fprintf(stderr, "Error closing bzip file: %d\n", bzerr);
+        eprintf( "Error closing bzip file: %d\n", bzerr);
         result = 1;
     }
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf( "Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf( "Failed to close output file %s\n", outfile);
         result = 1;
     }
 

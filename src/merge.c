@@ -10,55 +10,55 @@ static const char zero_record[LIBTEER_RECORD_LENGTH] = {0};
 
 int libTeer_basic_merge(const char *source, const char *target) {
     if (source == NULL) {
-        fprintf(stderr, "Source filename is null! Aborting...\n");
+        eprintf("Source filename is null! Aborting...\n");
         return 1;
     }
     if (target == NULL) {
-        fprintf(stderr, "Target filename is null! Aborting...\n");
+        eprintf("Target filename is null! Aborting...\n");
         return 1;
     }
 
     struct stat st1;
     if (stat(source, &st1))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", source);
+        eprintf("Failed to stat file %s!\n", source);
         return 1;
     }
 
     struct stat st2;
     if (stat(target, &st2))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", target);
+        eprintf("Failed to stat file %s!\n", target);
         return 1;
     }
 
     if (st1.st_size % LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", source, LIBTEER_RECORD_LENGTH);
+        eprintf("Not a tar file %s, filelength not divisible by %d!\n", source, LIBTEER_RECORD_LENGTH);
         return 1;
     }
     if (st2.st_size % LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", target, LIBTEER_RECORD_LENGTH);
+        eprintf("Not a tar file %s, filelength not divisible by %d!\n", target, LIBTEER_RECORD_LENGTH);
         return 1;
     }
 
     FILE *sourcefile = fopen(source, "rb");
     if (sourcefile == NULL) {
-        fprintf(stderr, "Failed to open file %s!\n", source);
+        eprintf("Failed to open file %s!\n", source);
         return 1;
     }
 
     FILE *targetfile = fopen(target, "rb");
     if (targetfile == NULL) {
-        fprintf(stderr, "Failed to open file %s!\n", target);
+        eprintf("Failed to open file %s!\n", target);
         fclose(sourcefile);
         return 1;
     }
 
     char (*source_records)[LIBTEER_RECORD_LENGTH] = malloc(st1.st_size);
     if (source_records == NULL) {
-        fprintf(stderr, "Could not allocate memory!\n");
+        eprintf("Could not allocate memory!\n");
         fclose(sourcefile);
         fclose(targetfile);
         return 1;
@@ -69,7 +69,7 @@ int libTeer_basic_merge(const char *source, const char *target) {
         if (data == NULL) {
             free(source_records);
             fclose(targetfile);
-            fprintf(stderr, "Could not allocate memory\n");
+            eprintf("Could not allocate memory\n");
             return 1;
         }
         memcpy(source_records[i], data, LIBTEER_RECORD_LENGTH);
@@ -79,13 +79,13 @@ int libTeer_basic_merge(const char *source, const char *target) {
     if (fclose(sourcefile) != 0) {
         free(source_records);
         fclose(targetfile);
-        fprintf(stderr, "Could not close file %s!\n", source);
+        eprintf("Could not close file %s!\n", source);
         return 1;
     }
 
     char (*target_records)[LIBTEER_RECORD_LENGTH] = malloc(st2.st_size);
     if (target_records == NULL) {
-        fprintf(stderr, "Could not allocate memory!\n");
+        eprintf("Could not allocate memory!\n");
         free(source_records);
         fclose(targetfile);
         return 1;
@@ -97,7 +97,7 @@ int libTeer_basic_merge(const char *source, const char *target) {
             free(source_records);
             free(target_records);
             fclose(targetfile);
-            fprintf(stderr, "Could not allocate memory\n");
+            eprintf("Could not allocate memory\n");
             return 1;
         }
         memcpy(target_records[i], data, LIBTEER_RECORD_LENGTH);
@@ -111,7 +111,7 @@ int libTeer_basic_merge(const char *source, const char *target) {
             if (memcmp(target_records[j], zero_record, LIBTEER_RECORD_LENGTH) != 0) target_filled_headers++;
         }
     } else {
-        fprintf(stderr, "File %s does not have 2 empty records at the end!\n", target);
+        eprintf("File %s does not have 2 empty records at the end!\n", target);
         free(source_records);
         free(target_records);
         fclose(targetfile);
@@ -120,7 +120,7 @@ int libTeer_basic_merge(const char *source, const char *target) {
 
     char (*new_records)[LIBTEER_RECORD_LENGTH] = realloc(target_records, (target_filled_headers + source_records_length) * LIBTEER_RECORD_LENGTH);
     if (new_records == NULL) {
-        fprintf(stderr, "Could not allocate memory!\n");
+        eprintf("Could not allocate memory!\n");
         free(source_records);
         free(target_records);
         fclose(targetfile);
@@ -135,13 +135,13 @@ int libTeer_basic_merge(const char *source, const char *target) {
     free(source_records);
 
     if (fclose(targetfile) != 0) {
-        fprintf(stderr, "Could not close file %s!\n", target);
+        eprintf("Could not close file %s!\n", target);
         free(new_records);
         return 1;
     }
     targetfile = fopen(target, "wb");
     if (targetfile == NULL) {
-        fprintf(stderr, "Failed to open file %s!\n", target);
+        eprintf("Failed to open file %s!\n", target);
         free(new_records);
         return 1;
     }
@@ -149,7 +149,7 @@ int libTeer_basic_merge(const char *source, const char *target) {
     for (int i = 0; i < target_records_length; i++) {
         for (int j = 0; j < LIBTEER_RECORD_LENGTH; j++) {
             if (fputc(target_records[i][j], targetfile) == EOF) {
-                fprintf(stderr, "Could not write to %s!\n", target);
+                eprintf("Could not write to %s!\n", target);
                 fclose(targetfile);
                 free(new_records);
                 return 1;
@@ -159,7 +159,7 @@ int libTeer_basic_merge(const char *source, const char *target) {
 
     free(new_records);
     if (fclose(targetfile) != 0) {
-        fprintf(stderr, "Could not close file %s!\n", target);
+        eprintf("Could not close file %s!\n", target);
         return 1;
     }
 
@@ -170,7 +170,7 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
     int rc = 0;
     LibTeer_Compression_Mode source_used_mode = AUTO_COMPRESSION;
     if (source_compression_mode < 0 || source_compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Source compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
+        eprintf("Source compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;
         return rc;
     }
@@ -187,7 +187,7 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
 
     LibTeer_Compression_Mode target_used_mode = AUTO_COMPRESSION;
     if (target_compression_mode < 0 || target_compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Target compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
+        eprintf("Target compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;
         return rc;
     }
@@ -208,7 +208,7 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
     rc = snprintf(rand_filename_source, 1024, "%s%s", get_tmpdir_path(), str_source);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return 1;
     }
 
@@ -218,7 +218,7 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
     rc = snprintf(rand_filename_target, 1024, "%s%s", get_tmpdir_path(), str_target);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return 1;
     }
 
@@ -240,11 +240,11 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
 
@@ -266,11 +266,11 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
 
@@ -310,11 +310,11 @@ int libTeer_merge(const char *source, const char *target, LibTeer_Compression_Mo
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
 

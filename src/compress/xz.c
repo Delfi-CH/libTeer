@@ -10,14 +10,14 @@ int libTeer_xz_decompress_file(const char *infile, const char *outfile)
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -31,7 +31,7 @@ int libTeer_xz_decompress_file(const char *infile, const char *outfile)
 
     if (ret != LZMA_OK)
     {
-        fprintf(stderr, "Failed to initialize LZMA decoder\n");
+        eprintf("Failed to initialize LZMA decoder\n");
         fclose(in);
         fclose(out);
         remove(outfile);
@@ -59,7 +59,7 @@ int libTeer_xz_decompress_file(const char *infile, const char *outfile)
             {
                 if (ferror(in))
                 {
-                    fprintf(stderr, "Failed to read input file\n");
+                    eprintf("Failed to read input file\n");
                     result = 1;
                     break;
                 }
@@ -81,7 +81,7 @@ int libTeer_xz_decompress_file(const char *infile, const char *outfile)
         {
             if (fwrite(out_buf, 1, written, out) != written)
             {
-                fprintf(stderr, "Writing failed\n");
+                eprintf("Writing failed\n");
                 result = 1;
                 break;
             }
@@ -95,7 +95,7 @@ int libTeer_xz_decompress_file(const char *infile, const char *outfile)
 
         if (ret != LZMA_OK)
         {
-            fprintf(stderr, "LZMA decompression failed: %d\n", ret);
+            eprintf("LZMA decompression failed: %d\n", ret);
             result = 1;
             break;
         }
@@ -110,13 +110,13 @@ int libTeer_xz_decompress_file(const char *infile, const char *outfile)
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 
@@ -132,21 +132,21 @@ int libTeer_xz_compress_file(const char *infile, const char *outfile, int compre
 {
     if (compression_level < 1 || compression_level > 9)
     {
-        fprintf(stderr, "Compression level out of range! Use a value from %d to %d\n", 1, 9);
+        eprintf("Compression level out of range! Use a value from %d to %d\n", 1, 9);
         return -1;
     }
 
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -160,7 +160,7 @@ int libTeer_xz_compress_file(const char *infile, const char *outfile, int compre
 
     if (ret != LZMA_OK)
     {
-        fprintf(stderr, "Failed to initialize LZMA encoder\n");
+        eprintf("Failed to initialize LZMA encoder\n");
         fclose(in);
         fclose(out);
         remove(outfile);
@@ -191,7 +191,7 @@ int libTeer_xz_compress_file(const char *infile, const char *outfile, int compre
             {
                 if (ferror(in))
                 {
-                    fprintf(stderr, "Failed to read input file\n");
+                    eprintf("Failed to read input file\n");
                     result = 1;
                     break;
                 }
@@ -211,7 +211,7 @@ int libTeer_xz_compress_file(const char *infile, const char *outfile, int compre
         {
             if (fwrite(out_buf, 1, written, out) != written)
             {
-                fprintf(stderr, "Writing failed\n");
+                eprintf("Writing failed\n");
                 result = 1;
                 break;
             }
@@ -223,7 +223,7 @@ int libTeer_xz_compress_file(const char *infile, const char *outfile, int compre
 
         if (ret != LZMA_OK)
         {
-            fprintf(stderr, "LZMA compression failed: %d\n", ret);
+            eprintf("LZMA compression failed: %d\n", ret);
             result = 1;
             break;
         }
@@ -238,13 +238,13 @@ int libTeer_xz_compress_file(const char *infile, const char *outfile, int compre
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 

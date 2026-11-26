@@ -12,26 +12,26 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
 {
     if (archive_name == NULL)
     {
-        fprintf(stderr, "Archive name is null! Aborting...\n");
+        eprintf("Archive name is null! Aborting...\n");
         return 1;
     }
     if (filename == NULL)
     {
-        fprintf(stderr, "Filename is null! Aborting...\n");
+        eprintf("Filename is null! Aborting...\n");
         return 1;
     }
 
     struct ustar_filebuf *fbuf = file_to_ustar_buffer(filename);
     if (fbuf == NULL)
     {
-        fprintf(stderr, "Failed to convert %s into a buffer!\n", filename);
+        eprintf("Failed to convert %s into a buffer!\n", filename);
         return 1;
     }
 
     struct stat st;
     if (stat(archive_name, &st))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", archive_name);
+        eprintf("Failed to stat file %s!\n", archive_name);
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -43,7 +43,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
 
     if (st.st_size % LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", archive_name, LIBTEER_RECORD_LENGTH);
+        eprintf("Not a tar file %s, filelength not divisible by %d!\n", archive_name, LIBTEER_RECORD_LENGTH);
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -56,7 +56,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     FILE *archive = fopen(archive_name, "rb");
     if (archive == NULL)
     {
-        fprintf(stderr, "Failed to open file %s!\n", archive_name);
+        eprintf("Failed to open file %s!\n", archive_name);
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -69,7 +69,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     char (*target_records)[LIBTEER_RECORD_LENGTH] = malloc(st.st_size);
     if (target_records == NULL)
     {
-        fprintf(stderr, "Could not allocate memory!\n");
+        eprintf("Could not allocate memory!\n");
         fclose(archive);
         if (fbuf->records != NULL)
         {
@@ -94,7 +94,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
             }
             free(fbuf->header);
             free(fbuf);
-            fprintf(stderr, "Could not allocate memory\n");
+            eprintf("Could not allocate memory\n");
             return 1;
         }
         memcpy(target_records[i], data, LIBTEER_RECORD_LENGTH);
@@ -113,7 +113,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     }
     else
     {
-        fprintf(stderr, "File %s does not have 2 empty records at the end!\n", archive_name);
+        eprintf("File %s does not have 2 empty records at the end!\n", archive_name);
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -128,7 +128,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     char (*new_records)[LIBTEER_RECORD_LENGTH] = realloc(target_records, (target_filled_headers + fbuf->record_count + 3 /*1 header + two zero records*/) * LIBTEER_RECORD_LENGTH);
     if (new_records == NULL)
     {
-        fprintf(stderr, "Could not allocate memory!\n");
+        eprintf("Could not allocate memory!\n");
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -145,7 +145,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     char *header_data = ustar_header_to_data(fbuf->header);
     if (header_data == NULL)
     {
-        fprintf(stderr, "Could not allocate memory!\n");
+        eprintf("Could not allocate memory!\n");
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -167,7 +167,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
 
     if (fclose(archive) != 0)
     {
-        fprintf(stderr, "Could not close file %s!\n", archive_name);
+        eprintf("Could not close file %s!\n", archive_name);
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -181,7 +181,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     archive = fopen(archive_name, "wb");
     if (archive == NULL)
     {
-        fprintf(stderr, "Failed to open file %s!\n", archive_name);
+        eprintf("Failed to open file %s!\n", archive_name);
         if (fbuf->records != NULL)
         {
             free(fbuf->records);
@@ -198,7 +198,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
         {
             if (fputc(target_records[i][j], archive) == EOF)
             {
-                fprintf(stderr, "Could not write to %s!\n", archive_name);
+                eprintf("Could not write to %s!\n", archive_name);
                 if (fbuf->records != NULL)
                 {
                     free(fbuf->records);
@@ -221,7 +221,7 @@ int libTeer_basic_append(const char *archive_name, const char *filename)
     free(fbuf);
     if (fclose(archive) != 0)
     {
-        fprintf(stderr, "Could not close file %s!\n", archive_name);
+        eprintf("Could not close file %s!\n", archive_name);
         return 1;
     }
 
@@ -234,7 +234,7 @@ int libTeer_append(const char *archive_name, const char *filename, LibTeer_Compr
     LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE)
     {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
+        eprintf("Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE - 1);
         rc = 1;
         return rc;
     }
@@ -259,7 +259,7 @@ int libTeer_append(const char *archive_name, const char *filename, LibTeer_Compr
     rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return 1;
     }
 
@@ -283,11 +283,11 @@ int libTeer_append(const char *archive_name, const char *filename, LibTeer_Compr
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
     if (rc != 0)
@@ -328,11 +328,11 @@ int libTeer_append(const char *archive_name, const char *filename, LibTeer_Compr
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
 

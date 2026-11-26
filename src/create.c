@@ -10,25 +10,25 @@ int libTeer_basic_create(const char *directory, const char *output)
 {
     if (directory == NULL)
     {
-        fprintf(stderr, "Directory name is null! Aborting...\n");
+        eprintf("Directory name is null! Aborting...\n");
         return 1;
     }
     if (output == NULL)
     {
-        fprintf(stderr, "Output name is null! Aborting...\n");
+        eprintf("Output name is null! Aborting...\n");
         return 1;
     }
 
     FILE *outfile = fopen(output, "wb");
     if (outfile == NULL)
     {
-        fprintf(stderr, "Failed to open file '%s'!\n", output);
+        eprintf("Failed to open file '%s'!\n", output);
         return 1;
     }
     struct filellist *list = get_directory_list(directory);
     if (list == NULL)
     {
-        fprintf(stderr, "Failed to parse directory: '%s'!\n", directory);
+        eprintf("Failed to parse directory: '%s'!\n", directory);
         fclose(outfile);
         return 1;
     }
@@ -38,7 +38,7 @@ int libTeer_basic_create(const char *directory, const char *output)
         struct ustar_filebuf *fbuf = file_to_ustar_buffer(list->data[i]);
         if (fbuf == NULL)
         {
-            fprintf(stderr, "Failed to convert %s into a buffer!\n", list->data[i]);
+            eprintf("Failed to convert %s into a buffer!\n", list->data[i]);
             free_directory_list(list);
             return 1;
         }   
@@ -46,7 +46,7 @@ int libTeer_basic_create(const char *directory, const char *output)
         size_t written = 0;
         char *header_data = ustar_header_to_data(fbuf->header);
         if (header_data == NULL) {
-            fprintf(stderr, "Failed to allocate memory!\n");
+            eprintf("Failed to allocate memory!\n");
             if (fbuf->records != NULL)
             {
                 free(fbuf->records);
@@ -61,7 +61,7 @@ int libTeer_basic_create(const char *directory, const char *output)
         free(header_data);
         if (written != LIBTEER_RECORD_LENGTH)
         {
-            fprintf(stderr, "Failed to write header to file! Expected %d, got %d bytes!\n", LIBTEER_RECORD_LENGTH, (int) written);
+            eprintf("Failed to write header to file! Expected %d, got %d bytes!\n", LIBTEER_RECORD_LENGTH, (int) written);
             if (fbuf->records != NULL)
             {
                 free(fbuf->records);
@@ -77,7 +77,7 @@ int libTeer_basic_create(const char *directory, const char *output)
             written = fwrite(&fbuf->records[j], 1, LIBTEER_RECORD_LENGTH, outfile);
             if (written != LIBTEER_RECORD_LENGTH)
             {
-                fprintf(stderr, "Failed to write buffer to file! Expected %d, got %d bytes!\n", LIBTEER_RECORD_LENGTH, (int) written);
+                eprintf("Failed to write buffer to file! Expected %d, got %d bytes!\n", LIBTEER_RECORD_LENGTH, (int) written);
                 if (fbuf->records != NULL)
                 {
                     free(fbuf->records);
@@ -101,7 +101,7 @@ int libTeer_basic_create(const char *directory, const char *output)
     size_t written = fwrite(zero_record, 1, LIBTEER_RECORD_LENGTH, outfile);
     if (written != LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Failed to zero buffer to file! Expected %d, got %d bytes!\n", LIBTEER_RECORD_LENGTH, (int) written);
+        eprintf("Failed to zero buffer to file! Expected %d, got %d bytes!\n", LIBTEER_RECORD_LENGTH, (int) written);
         free_directory_list(list);
         fclose(outfile);
         return 1;
@@ -118,7 +118,7 @@ int libTeer_create(const char *directory, const char *output, LibTeer_Compressio
     int rc = 0;
     LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
+        eprintf("Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
         rc = 1;
         return rc;
     }
@@ -139,7 +139,7 @@ int libTeer_create(const char *directory, const char *output, LibTeer_Compressio
     rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return 1;
     }
 
@@ -147,7 +147,7 @@ int libTeer_create(const char *directory, const char *output, LibTeer_Compressio
         rc = libTeer_basic_create(directory, output);
     } else if (used_mode == AUTO_COMPRESSION || used_mode == COMPRESSION_MODE_SIZE) {
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
     } else {
         rc = libTeer_basic_create(directory, rand_filename);
     }
@@ -176,11 +176,11 @@ int libTeer_create(const char *directory, const char *output, LibTeer_Compressio
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
 

@@ -9,7 +9,7 @@ LibTeer_Filelist *libTeer_basic_list_files(const char *archive_name) {
     if (archive_name == NULL) return NULL;
     struct ustar_headerlist *list = get_ustar_headers_of_file(archive_name);
     if (list == NULL) {
-        fprintf(stderr, "Failed to get list of headers!\n");
+        eprintf("Failed to get list of headers!\n");
         return NULL;
     }
 
@@ -62,7 +62,7 @@ LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compressi
     
     LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
+        eprintf("Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
         return NULL;
     }
 
@@ -81,7 +81,7 @@ LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compressi
     int rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return NULL;
     }
 
@@ -109,11 +109,11 @@ LibTeer_Filelist *libTeer_list_files(const char *archive_name, LibTeer_Compressi
         break;
     case AUTO_COMPRESSION:
         error = true;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         error = true;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
 

@@ -78,7 +78,7 @@ LibTeer_Compression_Mode get_mode_from_filename(const char *filename)
     }
     else
     {
-        fprintf(stderr, "Failed to determine compression mode from file extension '%s'!\n", ext);
+        eprintf("Failed to determine compression mode from file extension '%s'!\n", ext);
         free(dupfnmape);
         return -1;
     }

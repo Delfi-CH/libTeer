@@ -10,14 +10,14 @@ int libTeer_gzip_decompress_file(const char *infile, const char *outfile)
     gzFile in = gzopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     FILE *out = fopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         gzclose(in);
         return 1;
     }
@@ -31,7 +31,7 @@ int libTeer_gzip_decompress_file(const char *infile, const char *outfile)
         size_t written = fwrite(buf, 1, (size_t)read, out);
         if (written != (size_t)read)
         {
-            fprintf(stderr, "fwrite failed\n");
+            eprintf("fwrite failed\n");
             break;
         }
     }
@@ -39,20 +39,20 @@ int libTeer_gzip_decompress_file(const char *infile, const char *outfile)
     if (read < 0)
     {
         int errnum;
-        fprintf(stderr, "Decompression failed: %s\n",
+        eprintf("Decompression failed: %s\n",
                 gzerror(in, &errnum));
         result = 1;
     }
 
     if (fclose(out) != 0)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 
     if (gzclose(in) != Z_OK)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
@@ -68,14 +68,14 @@ int libTeer_gzip_compress_file(const char *infile, const char *outfile)
     FILE *in = fopen(infile, "rb");
     if (in == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", infile);
+        eprintf("Failed to open file %s\n", infile);
         return 1;
     }
 
     gzFile out = gzopen(outfile, "wb");
     if (out == NULL)
     {
-        fprintf(stderr, "Failed to open file %s\n", outfile);
+        eprintf("Failed to open file %s\n", outfile);
         fclose(in);
         return 1;
     }
@@ -89,7 +89,7 @@ int libTeer_gzip_compress_file(const char *infile, const char *outfile)
         int written = gzwrite(out, buf, read);
         if ((size_t)written != read)
         {
-            fprintf(stderr, "gzwrite failed\n");
+            eprintf("gzwrite failed\n");
             break;
         }
     }
@@ -97,20 +97,20 @@ int libTeer_gzip_compress_file(const char *infile, const char *outfile)
     if (read < 0)
     {
         int errnum;
-        fprintf(stderr, "Compression failed: %s\n",
+        eprintf("Compression failed: %s\n",
                 gzerror(out, &errnum));
         result = 1;
     }
 
     if (fclose(in) != 0)
     {
-        fprintf(stderr, "Failed to close input file %s\n", infile);
+        eprintf("Failed to close input file %s\n", infile);
         result = 1;
     }
 
     if (gzclose(out) != Z_OK)
     {
-        fprintf(stderr, "Failed to close output file %s\n", outfile);
+        eprintf("Failed to close output file %s\n", outfile);
         result = 1;
     }
 

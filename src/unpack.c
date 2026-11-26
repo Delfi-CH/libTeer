@@ -10,7 +10,7 @@
 int libTeer_basic_unpack(const char *filename, const char *directory)
 {
     if (filename == NULL) {
-        fprintf(stderr, "Filename is null! Aborting...\n");
+        eprintf("Filename is null! Aborting...\n");
         return 1;
     }
 
@@ -22,24 +22,24 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
     struct stat st;
     if (stat(filename, &st))
     {
-        fprintf(stderr, "Failed to stat file %s!\n", filename);
+        eprintf("Failed to stat file %s!\n", filename);
         return 1;
     }
 
     if (st.st_size % LIBTEER_RECORD_LENGTH)
     {
-        fprintf(stderr, "Not a tar file %s, filelength not divisible by %d!\n", filename, LIBTEER_RECORD_LENGTH);
+        eprintf("Not a tar file %s, filelength not divisible by %d!\n", filename, LIBTEER_RECORD_LENGTH);
         return 1;
     }
 
     FILE *tarball = fopen(filename, "rb");
     if (tarball == NULL) {
-        fprintf(stderr, "Failed to open file %s!\n", filename);
+        eprintf("Failed to open file %s!\n", filename);
         return 1;
     }
 
     if(chdir(directory)) {
-        fprintf(stderr, "Failed to change directory to %s!\n", directory);
+        eprintf("Failed to change directory to %s!\n", directory);
         fclose(tarball);
         return 1;
     }
@@ -49,7 +49,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
     char current_filename[255] = {0};
     LibTeer_UStarHeader *header = malloc(sizeof(LibTeer_UStarHeader));
     if (header == NULL) {
-        fprintf(stderr, "Failed to allocate memory!\n");
+        eprintf("Failed to allocate memory!\n");
         fclose(tarball);
         return 2;
     }
@@ -58,12 +58,12 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
     {
         buf = read_single_record(tarball);
         if (i == 0 && !is_record_ustar_header(buf)) {
-            fprintf(stderr, "File %s is not a ustar tarball!\n", filename);
+            eprintf("File %s is not a ustar tarball!\n", filename);
             fclose(tarball);
             return 1;
         }
         if (buf == NULL) {
-            fprintf(stderr, "Failed to read buffer!\n");
+            eprintf("Failed to read buffer!\n");
             fclose(tarball);
             return 2;
         }
@@ -90,7 +90,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                     #ifdef _WIN32
                     if(mkdir(path)) {
                         fclose(tarball);
-                        fprintf(stderr, "Failed to make directory %s!\n", path);
+                        eprintf("Failed to make directory %s!\n", path);
                         free(initial_working_directory);
                         free(buf);
                         free(header);
@@ -99,7 +99,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                     #else
                     if(mkdir(path, strtol(header->file_mode, NULL, 8))) {
                         fclose(tarball);
-                        fprintf(stderr, "Failed to make directory %s!\n", path);
+                        eprintf("Failed to make directory %s!\n", path);
                         free(initial_working_directory);
                         free(buf);
                         free(header);
@@ -111,7 +111,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 if (current_file != NULL) {
                     if(fclose(current_file)) {
                         fclose(tarball);
-                        fprintf(stderr, "Failed to close file %s!\n", current_filename);
+                        eprintf("Failed to close file %s!\n", current_filename);
                         free(initial_working_directory);
                         free(buf);
                         free(header);
@@ -119,7 +119,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                     }
                 }
                 if (snprintf(current_filename, sizeof(char) * 255, "%s", path) < 0) {
-                    fprintf(stderr, "Failed to write filename %s!\n", path);
+                    eprintf("Failed to write filename %s!\n", path);
                     fclose(tarball);
                     free(initial_working_directory);
                     free(buf);
@@ -129,7 +129,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
                 current_file = fopen(current_filename, "wb");
                 if (current_file == NULL) {
                     fclose(tarball);
-                    fprintf(stderr, "Failed to open file %s", current_filename);
+                    eprintf("Failed to open file %s", current_filename);
                     free(initial_working_directory);
                     free(buf);
                     free(header);
@@ -141,7 +141,7 @@ int libTeer_basic_unpack(const char *filename, const char *directory)
         {
             if (current_file == NULL) {
                 fclose(tarball);
-                fprintf(stderr, "Attempted to write to a null pointer! Aborting...\n");
+                eprintf("Attempted to write to a null pointer! Aborting...\n");
                 free(initial_working_directory);
                 free(buf);
                 free(header);
@@ -168,7 +168,7 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
     int rc = 0;
     LibTeer_Compression_Mode used_mode = AUTO_COMPRESSION;
     if (compression_mode < 0 || compression_mode > COMPRESSION_MODE_SIZE) {
-        fprintf(stderr, "Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
+        eprintf("Compression code not in range! Use a value from %d to %d!\n", 0, COMPRESSION_MODE_SIZE -1);
         rc = 1;
         return rc;
     }
@@ -189,7 +189,7 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
     rc = snprintf(rand_filename, 1024, "%s%s", get_tmpdir_path(), str);
     if (rc < 0)
     {
-        fprintf(stderr, "error: could not generate filename\n");
+        eprintf("error: could not generate filename\n");
         return 1;
     }
 
@@ -213,11 +213,11 @@ int libTeer_unpack(const char *filename, const char *directory, LibTeer_Compress
         break;
     case AUTO_COMPRESSION:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     case COMPRESSION_MODE_SIZE:
         rc = -2;
-        fprintf(stderr, "An unexpected error occured!\n");
+        eprintf("An unexpected error occured!\n");
         break;
     }
     if (rc != 0)
