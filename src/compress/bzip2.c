@@ -6,8 +6,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-const size_t BUFFER_SIZE = 512;
-
 int libTeer_bzip2_decompress_file(const char *infile, const char *outfile)
 {
     FILE *in = fopen(infile, "rb");
@@ -205,7 +203,7 @@ struct decompressed_buffer *libTeer_bzip2_decompress_buffer(const char *filename
         fclose(f);
         return NULL;
     }
-    char buf[BUFFER_SIZE];
+    char buf[LIBTEER_COMPRESSION_BUFFER_SIZE];
     size_t read;
 
     bool error = false;

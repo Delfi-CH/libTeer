@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "../libTeer.h"
+#include "../libTeer/compress.h"
 
 // Structs
 
@@ -38,5 +39,6 @@ struct ustar_headerlist *get_ustar_headers_of_file(const char *filename);
 void free_ustar_headerlist(struct ustar_headerlist *list);
 void free_directory_list(LibTeer_Filelist *list);
 char *get_tmpdir_path();
+struct decompressed_buffer *load_normal_file_to_buffer(const char *filename);
 
 #endif
