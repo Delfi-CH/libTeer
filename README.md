@@ -11,15 +11,6 @@ This library is a hobby project and not intended for use in serious projects.
 ## Installation
 
 **Arch Linux:**
-
-```bash
-git clone https://github.com/Delfi-CH/libTeer.git
-cd libTeer
-make archlinux-install
-```
-
-or
-
 ```bash
 wget https://raw.githubusercontent.com/Delfi-CH/libTeer/refs/heads/main/pkg/PKGBUILD
 makepkg -si
@@ -83,6 +74,8 @@ int main(int argc, char **argv) {
 
 ## Building
 
+This project uses [nob.h (github.com/tsoding/nob.h)](https://github.com/tsoding/nob.h) as its build system.
+
 ### Linux
 
 #### Quickstart
@@ -118,13 +111,11 @@ sudo pacman -S base-devel zlib xz bzip2 zstd
 ```bash
 git clone https://github.com/Delfi-CH/libTeer.git
 cd libTeer
-make
+cc nob.c -o nob && ./nob
 ```
 
 #### Requirements
 
-- GNU Make
-- GNU coreutils
 - gcc/clang
 
 **For compression:** 
@@ -138,53 +129,46 @@ make
 
 - wget
 - GNU autotools
+- GNU make
 - cmake
 
 #### Build options
 
-```bash
-make FEATURE_COMPRESSION=false
-# disables handling of gzip,xz,bz2 and zstd compressed archives, removes any dependencies outside of libc
+```
+Usage: ./nob [OPTIONS] [--] [ARGS]
+OPTIONS:
+    --help
+        Print this message and exit.
+    --enable-compression
+        Build the library with compression.
+        Default: true
+    --disable-compression
+        Build the library without compression.
+    --enable-shared
+        Build a shared library.
+        Default: true
+    --disable-shared
+        Dont build a shared library.
+    --enable-static
+        Build a static library.
+        Default: true
+    --disable-static
+        Dont build a static library.
+    --cc <str>
+        What C Compiler to use.
+        Default: cc
+    --ar <str>
+        What archiver to use.
+        Default: ar
+    --cflags <str> ... --cflags <str> ...
+        Additional Flags passed to the C Compiler
 
-make install
-# installs the .so or .a into /usr/lib and the nessecary headers into /usr/include/libTeer, requieres root permissions
-# on fedora linux the libdir is /usr/lib64, see example below
-# make install PREFIX=/usr LIBDIR=lib64
-
-make test
-# build and run the test programs
-
-make clean
-# removes all artifacts from the directories
-
-make VERSION=0.1.0
-# use a specific version string instead of the latest commit
-
-make OUTPUT=static
-# creates a .a archive instead of a shared object for static linking. if FEATURE_COMPRESSION=true, it will also download and build static versions of the compression libraries and include them in the .a archive
-
-make OPTFLAGS=-O2
-# build the library with optimisations
-
-make CC=clang
-# builds the library with clang
-
-make CC=clang FEATURE_MSAN=true FEATURE_COMPRESSION=false
-# builds the base library with the memory sanitizer 
-
-make archlinux-install
-# build and install an Arch Linux PKGBUILD 
-
-make PKGTYPE=git archlinux-install 
-# build and install an Arch Linux PKGBUILD, made from the latest git commit 
 ```
 
 ### Windows (mingw)
 
 #### Requirements
 
-- GNU Make
-- GNU coreutils
 - mingw
 
 **For compression:** 
@@ -198,6 +182,7 @@ make PKGTYPE=git archlinux-install
 
 - wget
 - GNU autotools
+- GNU make
 - cmake
 
 #### Building the project
@@ -205,21 +190,5 @@ make PKGTYPE=git archlinux-install
 ```bash
 git clone https://github.com/Delfi-CH/libTeer.git
 cd libTeer
-make PLATFORM=windows
-```
-
-#### Build options
-
-```bash
-make PLATFORM=windows test
-# build and run the test programs
-
-make clean
-# removes all artifacts from the directories
-
-make VERSION=0.1.0 PLATFORM=windows
-# use a specific version string instead of the latest commit
-
-make OUTPUT=static PLATFORM=windows
-# creates a .a archive instead of a shared object for static linking.
+cc nob.c -o nob -DTARGET_MINGW && ./nob --cc=x86_64-w64-mingw32-gcc
 ```

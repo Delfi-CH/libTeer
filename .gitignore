@@ -14,3 +14,7 @@ build
 test_*
 !test/*.c
 thirdparty
+!include/**
+nob*
+!nob.c
+!nob.h
